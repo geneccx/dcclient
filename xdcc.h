@@ -13,7 +13,6 @@
 #include <qlocalserver.h>
 #include <qlocalsocket.h>
 
-class IrcHandler;
 class GameRequester;
 class CGProxy;
 
@@ -68,7 +67,6 @@ private:
 	QTimer* timer;
 	QLocalServer* localServer;
 	QLocalSocket* clientConnection;
-	IrcHandler* irc;
 
 	CGProxy* gproxy;
 	QVector<GameInfo*> gameInfos;

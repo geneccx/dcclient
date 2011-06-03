@@ -29,17 +29,6 @@ xDCC::xDCC(QWidget *parent, Qt::WFlags flags)
 	connect(ui.txtChatInput, SIGNAL(returnPressed()), this, SLOT(handleChat()));
 	connect(ui.tabGames, SIGNAL(currentChanged(int)), this, SLOT(tick()));
 
-// 	ui.tblPubGames->hideColumn(2);
-// 	ui.tblPubGames->hideColumn(3);
-// 
-// 	ui.tblPrivGames->hideColumn(2);
-// 	ui.tblPrivGames->hideColumn(3);
-// 	ui.tblHLGames->hideColumn(2);
-// 	ui.tblHLGames->hideColumn(3);
-// 
-// 	ui.tblCustomGames->hideColumn(2);
-// 	ui.tblCustomGames->hideColumn(3);
-
 	ui.tblPubGames->horizontalHeader()->setResizeMode(0, QHeaderView::Interactive);
 	ui.tblPubGames->horizontalHeader()->setResizeMode(1, QHeaderView::Fixed);
 	ui.tblPubGames->horizontalHeader()->hideSection(2);
@@ -59,7 +48,6 @@ xDCC::xDCC(QWidget *parent, Qt::WFlags flags)
 	ui.tblCustomGames->horizontalHeader()->setResizeMode(1, QHeaderView::Fixed);
 	ui.tblCustomGames->horizontalHeader()->hideSection(2);
 	ui.tblCustomGames->horizontalHeader()->hideSection(3);
-	
 
  	ui.tblPlayers->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
  	ui.tblPlayers->horizontalHeader()->setResizeMode(1, QHeaderView::Stretch);
@@ -192,9 +180,8 @@ void xDCC::tick()
 
 void xDCC::activate()
 {
-	irc = new IrcHandler(this->GetUsername(), ui.tabChannels);
-
-	connect(irc, SIGNAL(showMessage(QString&, int)), this, SLOT(showMessage(QString&, int)));
+	ui.tabChannels->connectToIrc(this->GetUsername());
+	connect(ui.tabChannels, SIGNAL(showMessage(QString&, int)), this, SLOT(showMessage(QString&, int)));
 
 	tick();
 	timer->start(3000);
@@ -213,7 +200,7 @@ void xDCC::handleChat()
 	QString Message = ui.txtChatInput->text();
 	ui.txtChatInput->clear();
 
-	irc->handleChat(curTab, Message);
+	ui.tabChannels->handleChat(curTab, Message);
 }
 
 void xDCC::parseGamesXml(QString& data)
@@ -428,6 +415,28 @@ void xDCC::parsePlayersXml(QString& data)
 			itemRealm->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 			itemELO->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 			itemELO->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+			
+			QColor color;
+			if(i < 5)		// sentinel
+			{
+				if(i % 2)
+					color = QColor(0xFF, 0xEE, 0xEE);
+				else
+					color = QColor(0xFF, 0xF5, 0xF5);				
+			}
+			else if(i < 10)	// scourge
+			{
+				if(i % 2)
+					color = QColor(0xEE, 0xFF, 0xEE);
+				else
+					color = QColor(0xF5, 0xFF, 0xF5);		
+			}
+			else			// other cells
+				color = QColor(0xFF, 0xFF, 0xFF);
+
+			itemName->setBackgroundColor(color);
+			itemRealm->setBackgroundColor(color);
+			itemELO->setBackgroundColor(color);
 
 			ui.tblPlayers->setItem(i, 0, itemName);
 			ui.tblPlayers->setItem(i, 1, itemRealm);

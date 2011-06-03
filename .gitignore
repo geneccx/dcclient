@@ -1,5 +1,7 @@
 *.opensdf
 *.sdf
+*.aps
 Debug/*
+Release/*
 GeneratedFiles/*
-*.vcxproj.user
+*.vcxproj.*
