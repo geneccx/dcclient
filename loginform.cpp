@@ -98,7 +98,7 @@ void LoginForm::parseLogin(QString& data)
 
 		settings->setValue("Username", Username);
 
-		xdcc->SetUsername(Username);
+		xdcc->SetUsername(AccountName);
 		xdcc->SetScore(Score);
 		xdcc->SetRank(Rank);
 		xdcc->SetSessionID(SessionID);
