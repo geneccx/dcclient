@@ -1,32 +1,32 @@
-#include "xdcc.h"
-#include "irchandler.h"
+#include "ui_xdcc.h"
 #include "channelhandler.h"
 
-IrcHandler::IrcHandler(QString username, QTabWidget* parent) : QObject(parent),
-	m_Username(username)
+IrcHandler::IrcHandler(QWidget* parent) : QTabWidget(parent), irc(0)
+{
+	connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(myCloseTab(int)));
+}
+
+void IrcHandler::connectToIrc(QString name)
 {
 	irc = new Irc::Session(this);
 
-	connect(parent, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
 	connect(irc, SIGNAL(connected()), this, SLOT(irc_connected()));
 	connect(irc, SIGNAL(disconnected()), this, SLOT(irc_disconnected()));
 	connect(irc, SIGNAL(bufferAdded (Irc::Buffer*)), this, SLOT(irc_buffer_added(Irc::Buffer*)));
 	connect(irc, SIGNAL(bufferRemoved (Irc::Buffer*)), this, SLOT(irc_buffer_removed(Irc::Buffer*)));
 
-	irc->setNick(m_Username);
+	irc->setNick(name);
 	irc->setIdent("dcclient");
-	irc->setRealName(m_Username);
+	irc->setRealName(name);
 	irc->addAutoJoinChannel("#dcchat");
 	irc->addAutoJoinChannel("#dotacash");
 	irc->setAutoReconnectDelay(60);
 	irc->connectToServer("irc.dotacash.com", 6667);
 }
 
-void IrcHandler::closeTab(int idx)
+void IrcHandler::myCloseTab(int idx)
 {
-	QTabWidget* tabChannels = (QTabWidget*)parent();
-
-	QString channel = tabChannels->tabText(idx);
+	QString channel = this->tabText(idx);
 	if(channel == "#dcchat" || channel == "#dotacash")
 		return;
 
@@ -35,7 +35,7 @@ void IrcHandler::closeTab(int idx)
 		if(channel.at(0) == '#')
 			irc->part(channel);
 		else
-			removeTab(channel);
+			removeTabName(channel);
 	}
 }
 
@@ -148,20 +148,25 @@ void IrcHandler::irc_buffer_added(Irc::Buffer *buffer)
 
 	else
 	{
-		ChannelHandler* handler = new ChannelHandler(buffer, (QWidget*)parent());
+		ChannelHandler* handler = new ChannelHandler(buffer, this);
 
 		channelMap[name.toLower()] = handler;
-		QTabWidget* tabChannels = (QTabWidget*)parent();
-		
-		tabChannels->addTab(handler->GetTab(), name);
-		tabChannels->setCurrentIndex(tabChannels->count() - 1);
+
+		this->addTab(handler->GetTab(), name);
+
+		int idx = this->count() - 1;
+
+		if(name.toLower() == "#dotacash" || name.toLower() == "#dcchat")
+			this->tabBar()->setTabButton(idx, QTabBar::RightSide, 0);
+
+		this->setCurrentIndex(idx);
 	}
 }
 
 void IrcHandler::irc_buffer_removed(Irc::Buffer *buffer)
 {
 	QString name = buffer->receiver();
-	removeTab(name);
+	removeTabName(name);
 }
 
 void IrcHandler::messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags)
@@ -170,31 +175,29 @@ void IrcHandler::messageReceived(const QString &origin, const QString &message, 
 	
 	if(!handler)
 	{
-		handler = new ChannelHandler(NULL, (QWidget*)parent());
+		handler = new ChannelHandler(NULL, this);
 
 		channelMap[origin.toLower()] = handler;
-		QTabWidget* tabChannels = (QTabWidget*)parent();
 
-		tabChannels->addTab(handler->GetTab(), origin);
-		tabChannels->setCurrentIndex(tabChannels->count() - 1);		
+		this->addTab(handler->GetTab(), origin);
+		this->setCurrentIndex(this->count() - 1);		
 	}
 
 	QString txt = QString("<%1> %2").arg(origin).arg(message);
 	handler->showText(txt);
 }
 
-void IrcHandler::removeTab(QString name)
+void IrcHandler::removeTabName(QString name)
 {
 	ChannelHandler* chan = channelMap[name.toLower()];
-	QTabWidget* tabChannels = (QTabWidget*)parent();
 
 	if(chan)
 	{
-		for(int i = 0; i < tabChannels->count(); i++)
+		for(int i = 0; i < this->count(); i++)
 		{
-			if(tabChannels->tabText(i).toLower() == name.toLower())
+			if(this->tabText(i).toLower() == name.toLower())
 			{
-				tabChannels->removeTab(i);
+				this->removeTab(i);
 				break;
 			}
 		}

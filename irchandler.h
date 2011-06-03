@@ -1,7 +1,8 @@
 #ifndef IRCHANDLER_H
 #define IRCHANDLER_H
 
-#include "xdcc.h"
+#include <QTabWidget>
+#include <QMap>
 
 #define IRC_STATIC
 #include <ircclient-qt/Irc>
@@ -10,18 +11,16 @@
 
 class ChannelHandler;
 
-class IrcHandler : public QObject
+class IrcHandler : public QTabWidget
 {
 	Q_OBJECT
-
 public:
-	IrcHandler::IrcHandler(QString username, QTabWidget* parent);
+	IrcHandler::IrcHandler(QWidget* parent);
 
+	void connectToIrc(QString name);
 	void part(QString channel) { if(irc) irc->part(channel); }
 
 public slots:
-	void closeTab(int);
-
 	void irc_connected();
 	void irc_disconnected();
 	void irc_buffer_added(Irc::Buffer *buffer);
@@ -31,6 +30,7 @@ public slots:
 	void messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags);
 
 	void handleChat(QString&, QString&);
+	void myCloseTab(int);
 
 signals:
 	void showMessage(QString&, int timeout=3000);
@@ -40,11 +40,9 @@ private:
 
 	QMap<QString, ChannelHandler*> channelMap;
 
-	QTabWidget* m_Parent;
-
 	QString m_Username;
 
-	void removeTab(QString name);
+	void removeTabName(QString name);
 };
 
 #endif

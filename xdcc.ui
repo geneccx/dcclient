@@ -273,7 +273,7 @@
              <number>4</number>
             </property>
             <attribute name="horizontalHeaderVisible">
-             <bool>true</bool>
+             <bool>false</bool>
             </attribute>
             <attribute name="horizontalHeaderDefaultSectionSize">
              <number>210</number>
@@ -380,7 +380,7 @@
              <number>4</number>
             </property>
             <attribute name="horizontalHeaderVisible">
-             <bool>true</bool>
+             <bool>false</bool>
             </attribute>
             <attribute name="horizontalHeaderDefaultSectionSize">
              <number>210</number>
@@ -487,7 +487,7 @@
              <number>4</number>
             </property>
             <attribute name="horizontalHeaderVisible">
-             <bool>true</bool>
+             <bool>false</bool>
             </attribute>
             <attribute name="horizontalHeaderDefaultSectionSize">
              <number>210</number>
@@ -966,7 +966,7 @@
     <item row="1" column="0" colspan="3">
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QTabWidget" name="tabChannels">
+       <widget class="IrcHandler" name="tabChannels">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -1066,6 +1066,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>IrcHandler</class>
+   <extends>QTabWidget</extends>
+   <header>irchandler.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="xdcc.qrc"/>
  </resources>
