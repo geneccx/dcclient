@@ -1,0 +1,4 @@
+<RCC>
+    <qresource prefix="/xDCC"/>
+    <qresource prefix="/lang"/>
+</RCC>
