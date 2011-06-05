@@ -21,7 +21,7 @@ SettingsForm::~SettingsForm()
 
 void SettingsForm::saveSettings()
 {
-	m_SoundOnGameStart = ui.btnSave->isChecked();
+	m_SoundOnGameStart = ui.optionSoundGameStart->isChecked();
 	settings->setValue("GameStartedSound", m_SoundOnGameStart);
 
 	this->close();
