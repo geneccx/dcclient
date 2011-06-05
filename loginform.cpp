@@ -6,8 +6,8 @@
 #include <QMap>
 #include <QMessageBox>
 
-LoginForm::LoginForm(QWidget *parent, Qt::WFlags flags)
-	: QDialog(parent, flags)
+LoginForm::LoginForm(xDCC* nxDCC, QWidget *parent, Qt::WFlags flags)
+	: QDialog(parent, flags), m_xDCC(nxDCC)
 {
 	ui.setupUi(this);
 
@@ -83,11 +83,11 @@ void LoginForm::parseLogin(QString& data)
 			resultMap[currentTag] = xml.text().toString();
 		}
 	}
+
 	if (xml.error() && xml.error() != QXmlStreamReader::PrematureEndOfDocumentError)
 	{
 		qWarning() << "XML ERROR:" << xml.lineNumber() << ": " << xml.errorString();
 	}
-
 
 	if(resultMap["result"] == "1")
 	{
@@ -98,11 +98,11 @@ void LoginForm::parseLogin(QString& data)
 
 		settings->setValue("Username", Username);
 
-		xdcc->SetUsername(AccountName);
-		xdcc->SetScore(Score);
-		xdcc->SetRank(Rank);
-		xdcc->SetSessionID(SessionID);
-		xdcc->activate();
+		m_xDCC->SetUsername(AccountName);
+		m_xDCC->SetScore(Score);
+		m_xDCC->SetRank(Rank);
+		m_xDCC->SetSessionID(SessionID);
+		m_xDCC->activate();
 
 		this->hide();
 	}

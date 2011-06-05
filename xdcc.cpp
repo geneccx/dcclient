@@ -1,10 +1,13 @@
 #include "xdcc.h"
+#include "xdcc_version.h"
 
 #include "irchandler.h"
 #include "channelhandler.h"
 #include "xmlstructs.h"
 #include "dcapifetcher.h"
 #include "qgproxy.h"
+#include "loginform.h"
+#include "settingsform.h"
 
 #include <QClipboard>
 #include <QSharedPointer>
@@ -16,15 +19,17 @@ xDCC::xDCC(QWidget *parent, Qt::WFlags flags)
 {
 	ui.setupUi(this);
 
-	timer = new QTimer(this);
-	connect(timer, SIGNAL(timeout()), this, SLOT(tick()));
+	m_Settings = new QSettings("DotaCash", "DCClient X");
 
-	gproxy = new CGProxy(this);
+	m_Timer = new QTimer(this);
+	connect(m_Timer, SIGNAL(timeout()), this, SLOT(tick()));
 
-	localServer = new QLocalServer(this);
-	localServer->listen("DCClientIPC");
+	m_CGProxy = new CGProxy(this);
 
-	connect(localServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
+	m_LocalServer = new QLocalServer(this);
+	m_LocalServer->listen("DCClientIPC");
+
+	connect(m_LocalServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 
 	connect(ui.txtChatInput, SIGNAL(returnPressed()), this, SLOT(handleChat()));
 	connect(ui.tabGames, SIGNAL(currentChanged(int)), this, SLOT(tick()));
@@ -64,16 +69,35 @@ xDCC::xDCC(QWidget *parent, Qt::WFlags flags)
 	connect(ui.tblCustomGames, SIGNAL(cellClicked(int, int)), this, SLOT(gameClicked(int, int)));
 
 	connect(ui.actionCheck_for_updates, SIGNAL(triggered()), this, SLOT(checkForUpdates()));
+	connect(ui.action_About, SIGNAL(triggered()), this, SLOT(showAbout()));
+	connect(ui.action_Options, SIGNAL(triggered()), this, SLOT(showSettings()));
+
+	win_sparkle_init();
+
+	m_LoginForm = new LoginForm(this);
+	m_LoginForm->show();
+
+	m_SettingsForm = new SettingsForm(this);
 }
 
 xDCC::~xDCC()
 {
-	
+	win_sparkle_cleanup();
 }
 
 void xDCC::checkForUpdates()
 {
 	win_sparkle_check_update_with_ui();
+}
+
+void xDCC::showAbout()
+{
+	QMessageBox::information(this, "DotaCash Client X", tr("DotaCash Client X v%1 by Zephyrix").arg(XDCC_VERSION));
+}
+
+void xDCC::showSettings()
+{
+	m_SettingsForm->show();
 }
 
 void xDCC::gameDoubleClicked(int row, int column)
@@ -103,7 +127,7 @@ void xDCC::gameDoubleClicked(int row, int column)
 		QString safelistUrl = QString("http://www.dotacash.com/api/dccsl.php?u=%1&idLobby=%2").arg(m_SessionID).arg(id);
 		safelistFetcher->fetch(safelistUrl);
 
-		gproxy->requestGame(ip);
+		m_CGProxy->requestGame(ip);
 
 		ui.statusBar->showMessage(tr("%1 copied to clipboard and is now visible in LAN screen.").arg(txt), 3000);
 	}
@@ -126,7 +150,7 @@ void xDCC::gameClicked(int row, int column)
 		QTableWidgetItem* tblItem = table->item(row, 2);
 
 		if(tblItem)
-			currentID = tblItem->text();
+			m_CurrentID = tblItem->text();
 
 		tick();
 	}
@@ -134,18 +158,18 @@ void xDCC::gameClicked(int row, int column)
 
 void xDCC::newConnection()
 {
-	clientConnection = localServer->nextPendingConnection();
+	m_ClientConnection = m_LocalServer->nextPendingConnection();
 
-	connect(clientConnection, SIGNAL(disconnected()),
-		clientConnection, SLOT(deleteLater()));
+	connect(m_ClientConnection, SIGNAL(disconnected()),
+		m_ClientConnection, SLOT(deleteLater()));
 
-	connect(clientConnection, SIGNAL(readyRead()),
+	connect(m_ClientConnection, SIGNAL(readyRead()),
 		this, SLOT(readData()));
 }
 
 void xDCC::readData()
 {
-	QDataStream in(clientConnection);
+	QDataStream in(m_ClientConnection);
 
 	QString arg;
 	in >> arg;
@@ -155,20 +179,20 @@ void xDCC::readData()
 
 void xDCC::tick()
 {
-	if(!currentID.isEmpty())
+	if(!m_CurrentID.isEmpty())
 	{
 		ApiFetcher* playersFetcher = new ApiFetcher(this);
 		connect(playersFetcher, SIGNAL(fetchComplete(QString&)), this, SLOT(parsePlayersXml(QString&)));
 
-		QString playersUrl = QString("http://www.dotacash.com/api/gp.php?u=%1&l=%2").arg(m_SessionID).arg(currentID);
+		QString playersUrl = QString("http://www.dotacash.com/api/gp.php?u=%1&l=%2").arg(m_SessionID).arg(m_CurrentID);
 		playersFetcher->fetch(playersUrl);
 	}
 
 	ApiFetcher* gamesFetcher = new ApiFetcher(this);
 	connect(gamesFetcher, SIGNAL(fetchComplete(QString&)), this, SLOT(parseGamesXml(QString&)));
 
-	currentType = ui.tabGames->currentIndex();
-	QString gamesUrl = QString("http://www.dotacash.com/api/gg.php?u=%1&t=%2").arg(m_SessionID).arg(currentType+1);
+	m_CurrentType = ui.tabGames->currentIndex();
+	QString gamesUrl = QString("http://www.dotacash.com/api/gg.php?u=%1&t=%2").arg(m_SessionID).arg(m_CurrentType+1);
 	gamesFetcher->fetch(gamesUrl);
 
 	ApiFetcher* queueFetcher = new ApiFetcher(this);
@@ -183,10 +207,10 @@ void xDCC::activate()
 	ui.tabChannels->connectToIrc(this->GetUsername());
 	connect(ui.tabChannels, SIGNAL(showMessage(QString&, int)), this, SLOT(showMessage(QString&, int)));
 
-	tick();
-	timer->start(3000);
+	this->tick();
+	m_Timer->start(3000);
 
-	show();
+	this->show();
 }
 
 void xDCC::showMessage(QString& message, int timeout=3000)
@@ -207,10 +231,10 @@ void xDCC::parseGamesXml(QString& data)
 {
 	QXmlStreamReader xml(data);
 
-	for(int i = 0; i < gameInfos.size(); ++i)
-		delete gameInfos.at(i);
+	for(int i = 0; i < m_GameInfos.size(); ++i)
+		delete m_GameInfos.at(i);
 
-	gameInfos.clear();
+	m_GameInfos.clear();
 
 	QMap<QString, QString> resultMap;
 	QString currentTag;
@@ -234,7 +258,7 @@ void xDCC::parseGamesXml(QString& data)
 				gameInfo->players = resultMap["players"];
 				gameInfo->id = resultMap["idLobby"];
 
-				gameInfos.push_back(gameInfo);
+				m_GameInfos.push_back(gameInfo);
 
 				resultMap.clear();
 			}
@@ -255,7 +279,7 @@ void xDCC::parseGamesXml(QString& data)
 	{
 
 		QTableWidget* table;
-		switch(currentType)
+		switch(m_CurrentType)
 		{
 			case 0: table = ui.tblPubGames; break;
 			case 1: table = ui.tblPrivGames; break;
@@ -264,11 +288,11 @@ void xDCC::parseGamesXml(QString& data)
 			default: return;
 		}
 
-		table->setRowCount(gameInfos.size());
+		table->setRowCount(m_GameInfos.size());
 
-		for(int i = 0; i < gameInfos.size(); ++i)
+		for(int i = 0; i < m_GameInfos.size(); ++i)
 		{
-			GameInfo* gameInfo = gameInfos.at(i);
+			GameInfo* gameInfo = m_GameInfos.at(i);
 
 			QTableWidgetItem *itemName = new QTableWidgetItem( gameInfo->name );
 			QTableWidgetItem *itemPlrCount = new QTableWidgetItem( gameInfo->players );
@@ -294,10 +318,10 @@ void xDCC::parseQueueXml(QString& data)
 	QMap<QString, QString> resultMap;
 	QString currentTag;
 
-	for(int i = 0; i < queueInfos.size(); ++i)
-		delete queueInfos.at(i);
+	for(int i = 0; i < m_QueueInfos.size(); ++i)
+		delete m_QueueInfos.at(i);
 
-	queueInfos.clear();
+	m_QueueInfos.clear();
 
 	while (!xml.atEnd())
 	{
@@ -316,7 +340,7 @@ void xDCC::parseQueueXml(QString& data)
 				queueInfo->position = resultMap["Position"];
 				queueInfo->name = resultMap["GameName"];
 
-				queueInfos.push_back(queueInfo);
+				m_QueueInfos.push_back(queueInfo);
 
 				resultMap.clear();
 			}
@@ -335,11 +359,11 @@ void xDCC::parseQueueXml(QString& data)
 	}
 	else
 	{
-		ui.tblQueue->setRowCount(queueInfos.size());
+		ui.tblQueue->setRowCount(m_QueueInfos.size());
 
-		for(int i = 0; i < queueInfos.size(); ++i)
+		for(int i = 0; i < m_QueueInfos.size(); ++i)
 		{
-			QueueInfo* queueInfo = queueInfos.at(i);
+			QueueInfo* queueInfo = m_QueueInfos.at(i);
 			QTableWidgetItem *itemName = new QTableWidgetItem( queueInfo->name );
 
 			itemName->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
@@ -357,10 +381,10 @@ void xDCC::parsePlayersXml(QString& data)
 	QMap<QString, QString> resultMap;
 	QString currentTag;
 
-	for(int i = 0; i < playerInfos.size(); ++i)
-		delete playerInfos.at(i);
+	for(int i = 0; i < m_PlayerInfos.size(); ++i)
+		delete m_PlayerInfos.at(i);
 
-	playerInfos.clear();
+	m_PlayerInfos.clear();
 
 	while (!xml.atEnd())
 	{
@@ -381,7 +405,7 @@ void xDCC::parsePlayersXml(QString& data)
 				playerInfo->realm = resultMap["playerrealm"];
 				playerInfo->elo = resultMap["playerelo"];
 
-				playerInfos.push_back(playerInfo);
+				m_PlayerInfos.push_back(playerInfo);
 
 				resultMap.clear();
 			}
@@ -400,11 +424,11 @@ void xDCC::parsePlayersXml(QString& data)
 	}
 	else
 	{
-		ui.tblPlayers->setRowCount(playerInfos.size());
+		ui.tblPlayers->setRowCount(m_PlayerInfos.size());
 	
-		for(int i = 0; i < playerInfos.size(); ++i)
+		for(int i = 0; i < m_PlayerInfos.size(); ++i)
 		{
-			PlayerInfo* playerInfo = playerInfos.at(i);
+			PlayerInfo* playerInfo = m_PlayerInfos.at(i);
 			QTableWidgetItem *itemName = new QTableWidgetItem( playerInfo->name );
 			QTableWidgetItem *itemRealm = new QTableWidgetItem( playerInfo->realm );
 			QTableWidgetItem *itemELO = new QTableWidgetItem( playerInfo->elo );

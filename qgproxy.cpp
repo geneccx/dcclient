@@ -3,6 +3,8 @@
 #include "gameprotocol.h"
 #include "commandpacket.h"
 
+#include <QSettings>
+#include <QSound>
 #include <QtEndian>
 
 #include <time.h>
@@ -692,6 +694,11 @@ void CGProxy::processServerPackets()
 					delete games.front( );
 					games.pop_front( );
 				}
+
+				QSettings settings("DotaCash", "DCClient X");
+
+				if(settings.value("GameStartedSound", true).toBool())
+					QSound::play("./sounds/GameStarted.wav");
 
 				m_GameStarted = true;
 			}

@@ -30,8 +30,6 @@ void msgHandler(QtMsgType type, const char *msg)
 
 int main(int argc, char *argv[])
 {
-	win_sparkle_set_appcast_url("http://www.dotacash.com/xdcc/appcast.xml");
-
 	//oldHandler = qInstallMsgHandler(msgHandler);
 
 	QApplication a(argc, argv);
@@ -72,14 +70,5 @@ int main(int argc, char *argv[])
 	_singular->create(1);
 
 	xDCC xdcc;
-	LoginForm login;
-
-	login.SetMainWindow(&xdcc);
-	login.show();
-
-	win_sparkle_init();
-	int retVal = a.exec();
-
-	win_sparkle_cleanup();
-	return retVal;
+	return a.exec();
 }

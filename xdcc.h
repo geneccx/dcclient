@@ -12,9 +12,12 @@
 #include <QTimer>
 #include <qlocalserver.h>
 #include <qlocalsocket.h>
+#include <QSettings>
 
 class GameRequester;
 class CGProxy;
+class LoginForm;
+class SettingsForm;
 
 struct GameInfo;
 struct QueueInfo;
@@ -55,26 +58,32 @@ public slots:
 
 	void showMessage(QString&, int);
 	void checkForUpdates();
+	void showAbout();
+	void showSettings();
 
 private:
 	Ui::xDCCClass ui;
+	LoginForm* m_LoginForm;
+	SettingsForm* m_SettingsForm;
+
+	QSettings* m_Settings;
 
 	QString m_Username;
 	quint32 m_Score;
 	quint32 m_Rank;
 	QString m_SessionID;
 
-	QTimer* timer;
-	QLocalServer* localServer;
-	QLocalSocket* clientConnection;
+	QTimer* m_Timer;
+	QLocalServer* m_LocalServer;
+	QLocalSocket* m_ClientConnection;
 
-	CGProxy* gproxy;
-	QVector<GameInfo*> gameInfos;
-	QVector<QueueInfo*> queueInfos;
-	QVector<PlayerInfo*> playerInfos;
+	CGProxy* m_CGProxy;
+	QVector<GameInfo*> m_GameInfos;
+	QVector<QueueInfo*> m_QueueInfos;
+	QVector<PlayerInfo*> m_PlayerInfos;
 
-	int currentType;
-	QString currentID;
+	int m_CurrentType;
+	QString m_CurrentID;
 };
 
 #endif // XDCC_H
