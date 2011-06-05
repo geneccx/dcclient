@@ -95,6 +95,7 @@ CGProxy::CGProxy(QWidget* parent) : QObject(parent), m_LocalSocket(0)
 	m_LastActionTime = 0;
 
 	m_RemoteSocket = new QTcpSocket(this);
+
 	connect(m_RemoteSocket, SIGNAL(disconnected()),
 		this, SLOT(remoteDisconnected()));
 	connect(m_RemoteSocket, SIGNAL(readyRead()), this, SLOT(readServerPackets()));
@@ -253,9 +254,11 @@ void CGProxy::update()
 		}
 	}
 
-	for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
-		m_UDPSocket->writeDatagram((*i)->GetPacket(6125), QHostAddress::LocalHost, 6112);
-
+	if( !m_LocalSocket || m_LocalSocket->state() !=  QTcpSocket::ConnectedState)
+	{
+		for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
+			m_UDPSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
+	}
 }
 
 void CGProxy::newConnection()

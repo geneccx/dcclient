@@ -121,8 +121,6 @@ void xDCC::gameDoubleClicked(int row, int column)
 		QClipboard *cb = QApplication::clipboard();
 		cb->setText(txt);
 
-		
-
 		ApiFetcher* safelistFetcher = new ApiFetcher(this);
 		QString safelistUrl = QString("http://www.dotacash.com/api/dccsl.php?u=%1&idLobby=%2").arg(m_SessionID).arg(id);
 		safelistFetcher->fetch(safelistUrl);
