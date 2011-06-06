@@ -15,7 +15,7 @@ class IrcHandler : public QTabWidget
 {
 	Q_OBJECT
 public:
-	IrcHandler::IrcHandler(QWidget* parent);
+	IrcHandler(QWidget* parent);
 
 	void connectToIrc(QString name);
 	void part(QString channel) { if(irc) irc->part(channel); }
@@ -33,7 +33,7 @@ public slots:
 	void myCloseTab(int);
 
 signals:
-	void showMessage(QString&, int timeout=3000);
+	void showMessage(QString, int timeout=3000);
 
 private:
 	Irc::Session *irc;

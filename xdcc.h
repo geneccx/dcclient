@@ -56,7 +56,7 @@ public slots:
 	void parseQueueXml(QString&);
 	void parsePlayersXml(QString&);
 
-	void showMessage(QString&, int);
+	void showMessage(QString, int);
 	void checkForUpdates();
 	void showAbout();
 	void showSettings();

@@ -211,7 +211,7 @@ void xDCC::activate()
 	this->show();
 }
 
-void xDCC::showMessage(QString& message, int timeout=3000)
+void xDCC::showMessage(QString message, int timeout=3000)
 {
 	ui.statusBar->showMessage(message, timeout);
 }
