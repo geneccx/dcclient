@@ -254,11 +254,9 @@ void CGProxy::update()
 		}
 	}
 
-	if( !m_LocalSocket || m_LocalSocket->state() !=  QTcpSocket::ConnectedState)
-	{
-		for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
-			m_UDPSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
-	}
+	for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
+		m_UDPSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
+
 }
 
 void CGProxy::newConnection()

@@ -108,6 +108,6 @@ void LoginForm::parseLogin(QString& data)
 	}
 	else
 	{
-		QMessageBox::information(NULL, "", tr("Invalid Login!"));
+		QMessageBox::information(this, "", QString("%1").arg(resultMap["reason"]));
 	}
 }
