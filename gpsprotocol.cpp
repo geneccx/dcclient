@@ -18,8 +18,7 @@
 
 #include "gpsprotocol.h"
 #include <QtEndian>
-#include <QDataStream>
-#include <QDebug>
+
 //
 // CGPSProtocol
 //
