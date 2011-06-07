@@ -11,6 +11,7 @@
 
 #include <QClipboard>
 #include <QSharedPointer>
+#include <QImage>
 
 #include <winsparkle.h>
 
@@ -81,6 +82,15 @@ xDCC::xDCC(QWidget *parent, Qt::WFlags flags)
 	m_LoginForm->show();
 
 	m_SettingsForm = new SettingsForm(this);
+
+	QImage bg;
+	if (bg.load("background.png"))
+	{
+		QPalette palette;
+		palette.setBrush(this->backgroundRole(), QBrush(bg));
+
+		this->setPalette(palette);
+	}
 }
 
 xDCC::~xDCC()

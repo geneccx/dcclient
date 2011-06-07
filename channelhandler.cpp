@@ -17,6 +17,7 @@ ChannelHandler::ChannelHandler(Irc::Buffer* nBuffer, QWidget* parent)
 	lstUsers->setSortingEnabled(true);
 	lstUsers->setMaximumWidth(180);
 	lstUsers->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	lstUsers->setAlternatingRowColors(true);
 	
 	horizontalLayout->addWidget(lstUsers);
 
