@@ -14,6 +14,7 @@
 #include <QImage>
 #include <QSettings>
 #include <QFile>
+#include <QEvent>
 
 #include <winsparkle.h>
 
@@ -98,11 +99,45 @@ XDCC::XDCC(QWidget *parent, Qt::WFlags flags)
 
 		this->setStyleSheet(style);
 	}
+
+	m_Active = true;
+	qApp->installEventFilter( this );
 }
 
 XDCC::~XDCC()
 {
 	win_sparkle_cleanup();
+}
+
+bool XDCC::eventFilter(QObject *obj,  QEvent *event)
+{
+	static bool inActivationEvent = false;
+
+	if (obj == qApp && !inActivationEvent)
+	{
+		if (event->type() == QEvent::ApplicationActivate && !m_Active)
+		{
+			inActivationEvent = true;
+
+			m_Active = true;
+			this->tick();
+			m_Timer->start(3000);
+			
+			inActivationEvent = false;
+		}
+
+		else if (event->type() == QEvent::ApplicationDeactivate && m_Active)
+		{
+			inActivationEvent = true;
+
+			m_Active = false;
+			m_Timer->stop();
+
+			inActivationEvent = false;
+		}
+	}
+
+	return QMainWindow::eventFilter(obj, event);
 }
 
 void XDCC::checkForUpdates()
@@ -197,6 +232,9 @@ void XDCC::readData()
 
 void XDCC::tick()
 {
+	if(!m_Active)
+		return;
+
 	if(!m_CurrentID.isEmpty())
 	{
 		ApiFetcher* playersFetcher = new ApiFetcher(this);

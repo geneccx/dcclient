@@ -86,6 +86,10 @@ private:
 	QString m_CurrentID;
 
 	QString m_Skin;
+
+	bool m_Active;
+
+	bool eventFilter(QObject *obj,  QEvent *event);
 };
 
 #endif // XDCC_H
