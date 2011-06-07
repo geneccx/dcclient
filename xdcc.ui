@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>806</width>
-    <height>634</height>
+    <width>921</width>
+    <height>770</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>806</width>
+    <width>921</width>
     <height>634</height>
    </size>
   </property>
@@ -125,6 +125,12 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>304</height>
+             </size>
             </property>
             <property name="sizeIncrement">
              <size>
@@ -551,7 +557,7 @@
        <widget class="QTableWidget" name="tblPlayers">
         <property name="minimumSize">
          <size>
-          <width>320</width>
+          <width>430</width>
           <height>0</height>
          </size>
         </property>
@@ -589,7 +595,7 @@
          <enum>QAbstractItemView::SelectRows</enum>
         </property>
         <property name="columnCount">
-         <number>3</number>
+         <number>6</number>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>true</bool>
@@ -625,6 +631,21 @@
         <column>
          <property name="text">
           <string>ELO</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Games</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>KDR</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Win %</string>
          </property>
         </column>
        </widget>
@@ -899,7 +920,7 @@
           <property name="maximumSize">
            <size>
             <width>178</width>
-            <height>16777215</height>
+            <height>304</height>
            </size>
           </property>
           <property name="font">
@@ -924,7 +945,7 @@
            <bool>false</bool>
           </attribute>
           <attribute name="horizontalHeaderDefaultSectionSize">
-           <number>190</number>
+           <number>170</number>
           </attribute>
           <attribute name="horizontalHeaderMinimumSectionSize">
            <number>130</number>
@@ -1028,7 +1049,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>806</width>
+     <width>921</width>
      <height>21</height>
     </rect>
    </property>

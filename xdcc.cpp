@@ -55,8 +55,11 @@ xDCC::xDCC(QWidget *parent, Qt::WFlags flags)
 	ui.tblCustomGames->horizontalHeader()->hideSection(3);
 
  	ui.tblPlayers->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
- 	ui.tblPlayers->horizontalHeader()->setResizeMode(1, QHeaderView::Stretch);
+ 	ui.tblPlayers->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
  	ui.tblPlayers->horizontalHeader()->setResizeMode(2, QHeaderView::ResizeToContents);
+	ui.tblPlayers->horizontalHeader()->setResizeMode(3, QHeaderView::ResizeToContents);
+	ui.tblPlayers->horizontalHeader()->setResizeMode(4, QHeaderView::ResizeToContents);
+	ui.tblPlayers->horizontalHeader()->setResizeMode(5, QHeaderView::ResizeToContents);
 
 	connect(ui.tblPubGames, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(gameDoubleClicked(int, int)));
 	connect(ui.tblPrivGames, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(gameDoubleClicked(int, int)));
@@ -402,6 +405,9 @@ void xDCC::parsePlayersXml(QString& data)
 				playerInfo->slot = resultMap["playerslot"];
 				playerInfo->realm = resultMap["playerrealm"];
 				playerInfo->elo = resultMap["playerelo"];
+				playerInfo->games = resultMap["playergames"];
+				playerInfo->kdr = resultMap["playerkdr"];
+				playerInfo->wins = resultMap["playerwins"];
 
 				m_PlayerInfos.push_back(playerInfo);
 
@@ -430,13 +436,26 @@ void xDCC::parsePlayersXml(QString& data)
 			QTableWidgetItem *itemName = new QTableWidgetItem( playerInfo->name );
 			QTableWidgetItem *itemRealm = new QTableWidgetItem( playerInfo->realm );
 			QTableWidgetItem *itemELO = new QTableWidgetItem( playerInfo->elo );
+			QTableWidgetItem *itemGames = new QTableWidgetItem( playerInfo->games );
+			QTableWidgetItem *itemKDR = new QTableWidgetItem( playerInfo->kdr );
+			QTableWidgetItem *itemWins = new QTableWidgetItem( playerInfo->wins );
 
 			itemName->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 			//itemName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 			itemRealm->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 			itemRealm->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
 			itemELO->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 			itemELO->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+			itemGames->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+			itemGames->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+			itemKDR->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+			itemKDR->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+			itemWins->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+			itemWins->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 			
 			QColor color;
 			if(i < 5)		// sentinel
@@ -459,10 +478,16 @@ void xDCC::parsePlayersXml(QString& data)
 			itemName->setBackgroundColor(color);
 			itemRealm->setBackgroundColor(color);
 			itemELO->setBackgroundColor(color);
+			itemGames->setBackgroundColor(color);
+			itemKDR->setBackgroundColor(color);
+			itemWins->setBackgroundColor(color);
 
 			ui.tblPlayers->setItem(i, 0, itemName);
 			ui.tblPlayers->setItem(i, 1, itemRealm);
 			ui.tblPlayers->setItem(i, 2, itemELO);
+			ui.tblPlayers->setItem(i, 3, itemGames);
+			ui.tblPlayers->setItem(i, 4, itemKDR);
+			ui.tblPlayers->setItem(i, 5, itemWins);
 		}
 	}
 }

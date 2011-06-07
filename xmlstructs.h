@@ -23,6 +23,9 @@ struct PlayerInfo
 	QString slot;
 	QString realm;
 	QString elo;
+	QString games;
+	QString kdr;
+	QString wins;
 };
 
 #endif
