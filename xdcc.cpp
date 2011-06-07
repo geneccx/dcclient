@@ -13,6 +13,7 @@
 #include <QSharedPointer>
 #include <QImage>
 #include <QSettings>
+#include <QFile>
 
 #include <winsparkle.h>
 
@@ -84,10 +85,19 @@ XDCC::XDCC(QWidget *parent, Qt::WFlags flags)
 
 	m_SettingsForm = new SettingsForm(this);
 
-	QString background = m_Settings->value("Background", "").toString();
+ 	m_Skin = m_Settings->value("Skin", "default").toString();
+ 
+	QFile styleSheet(QString("./skins/%1/style.css").arg(m_Skin));
+	QString style;
 
-	if(!background.isEmpty())
-		this->setStyleSheet(QString("QWidget#centralWidget {background-image: url(%1)}").arg(background));
+	if(styleSheet.open(QFile::ReadOnly))
+	{
+		QTextStream styleIn(&styleSheet);
+		style = styleIn.readAll();
+		styleSheet.close();
+
+		this->setStyleSheet(style);
+	}
 }
 
 XDCC::~XDCC()

@@ -1,4 +1,4 @@
-#include "ui_xdcc.h"
+#include "ui_xdcc_main.h"
 #include "channelhandler.h"
 
 IrcHandler::IrcHandler(QWidget* parent) : QTabWidget(parent), irc(0)

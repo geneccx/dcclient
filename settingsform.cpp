@@ -1,6 +1,6 @@
 #include "settingsform.h"
 #include <QMessageBox>
-#include <QFileDialog>
+#include <QDir>
 
 SettingsForm::SettingsForm(QWidget *parent, Qt::WFlags flags)
 	: QDialog(parent, flags)
@@ -14,10 +14,16 @@ SettingsForm::SettingsForm(QWidget *parent, Qt::WFlags flags)
 	m_SoundOnGameStart = settings->value("GameStartedSound", true).toBool();
  	ui.optionSoundGameStart->setCheckState(m_SoundOnGameStart ? Qt::Checked : Qt::Unchecked);
 
-	m_BackgroundImage = settings->value("Background", "").toString();
-	ui.txtBackground->setText(m_BackgroundImage);
+	m_Skin = settings->value("Skin", "default").toString();
 
-	connect(ui.btnBrowse, SIGNAL(clicked()), this, SLOT(browseBackground()));
+	QDir skinsDir("./skins/");
+	QStringList skinsList = skinsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+	ui.cmbSkin->addItems(skinsList);
+
+	int idx = ui.cmbSkin->findText(m_Skin);
+	
+	if(idx != -1)
+		ui.cmbSkin->setCurrentIndex(idx);
 }
 
 SettingsForm::~SettingsForm()
@@ -25,26 +31,26 @@ SettingsForm::~SettingsForm()
 
 }
 
-void SettingsForm::browseBackground()
-{
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Select background image"), QString(), tr("Image Files (*.png *.jpg *.bmp)"));
-	
-	if(!fileName.isEmpty())
-	{
-		ui.txtBackground->setText(fileName);
-
-		QMainWindow* mainWindow = (QMainWindow*)parent();
-		mainWindow->setStyleSheet(QString("QWidget#centralWidget {background-image: url(%1)}").arg(fileName));
-	}
-}
-
 void SettingsForm::saveSettings()
 {
 	m_SoundOnGameStart = ui.optionSoundGameStart->isChecked();
 	settings->setValue("GameStartedSound", m_SoundOnGameStart);
 
-	m_BackgroundImage = ui.txtBackground->text();
-	settings->setValue("Background", m_BackgroundImage);
+	m_Skin = ui.cmbSkin->currentText();
+	settings->setValue("Skin", m_Skin);
+
+	QFile styleSheet(QString("./skins/%1/style.css").arg(m_Skin));
+	QString style;
+
+	if(styleSheet.open(QFile::ReadOnly))
+	{
+		QTextStream styleIn(&styleSheet);
+		style = styleIn.readAll();
+		styleSheet.close();
+
+		QMainWindow* parent = (QMainWindow*)this->parent();
+		parent->setStyleSheet(style);
+	}
 
 	this->close();
 }

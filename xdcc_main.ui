@@ -882,7 +882,7 @@
          <number>15</number>
         </property>
         <item row="1" column="0">
-         <widget class="QLabel" name="lblGamingProfile_2">
+         <widget class="QLabel" name="lblGamesInQueue">
           <property name="minimumSize">
            <size>
             <width>0</width>

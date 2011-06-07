@@ -84,6 +84,8 @@ private:
 
 	int m_CurrentType;
 	QString m_CurrentID;
+
+	QString m_Skin;
 };
 
 #endif // XDCC_H
