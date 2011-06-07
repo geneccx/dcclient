@@ -1,7 +1,7 @@
 #ifndef XDCC_H
 #define XDCC_H
 
-#include "ui_xdcc.h"
+#include "ui_xdcc_main.h"
 
 #include <QtGui/QMainWindow>
 #include <QNetworkAccessManager>
@@ -23,13 +23,13 @@ struct GameInfo;
 struct QueueInfo;
 struct PlayerInfo;
 
-class xDCC : public QMainWindow
+class XDCC : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	xDCC(QWidget *parent = 0, Qt::WFlags flags = 0);
-	~xDCC();
+	XDCC(QWidget *parent = 0, Qt::WFlags flags = 0);
+	~XDCC();
 
 	void SetUsername(QString nUsername)		{ m_Username = nUsername; ui.lbl_Account->setText(m_Username); }
 	void SetScore(quint32 nScore)			{ m_Score = nScore; ui.lbl_Rating->setText(QString::number(m_Score)); }

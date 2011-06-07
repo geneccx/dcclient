@@ -6,7 +6,7 @@
 #include <QMap>
 #include <QMessageBox>
 
-LoginForm::LoginForm(xDCC* nxDCC, QWidget *parent, Qt::WFlags flags)
+LoginForm::LoginForm(XDCC* nxDCC, QWidget *parent, Qt::WFlags flags)
 	: QDialog(parent, flags), m_xDCC(nxDCC)
 {
 	ui.setupUi(this);

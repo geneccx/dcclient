@@ -16,7 +16,7 @@
 
 #include <winsparkle.h>
 
-xDCC::xDCC(QWidget *parent, Qt::WFlags flags)
+XDCC::XDCC(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
 	ui.setupUi(this);
@@ -90,27 +90,27 @@ xDCC::xDCC(QWidget *parent, Qt::WFlags flags)
 		this->setStyleSheet(QString("QWidget#centralWidget {background-image: url(%1)}").arg(background));
 }
 
-xDCC::~xDCC()
+XDCC::~XDCC()
 {
 	win_sparkle_cleanup();
 }
 
-void xDCC::checkForUpdates()
+void XDCC::checkForUpdates()
 {
 	win_sparkle_check_update_with_ui();
 }
 
-void xDCC::showAbout()
+void XDCC::showAbout()
 {
 	QMessageBox::information(this, "DotaCash Client X", tr("DotaCash Client X v%1 by Zephyrix").arg(XDCC_VERSION));
 }
 
-void xDCC::showSettings()
+void XDCC::showSettings()
 {
 	m_SettingsForm->show();
 }
 
-void xDCC::gameDoubleClicked(int row, int column)
+void XDCC::gameDoubleClicked(int row, int column)
 {
 	QTableWidget* table;
 	switch(ui.tabGames->currentIndex())
@@ -141,7 +141,7 @@ void xDCC::gameDoubleClicked(int row, int column)
 	}
 }
 
-void xDCC::gameClicked(int row, int column)
+void XDCC::gameClicked(int row, int column)
 {
 	QTableWidget* table;
 	switch(ui.tabGames->currentIndex())
@@ -164,7 +164,7 @@ void xDCC::gameClicked(int row, int column)
 	}
 }
 
-void xDCC::newConnection()
+void XDCC::newConnection()
 {
 	m_ClientConnection = m_LocalServer->nextPendingConnection();
 
@@ -175,7 +175,7 @@ void xDCC::newConnection()
 		this, SLOT(readData()));
 }
 
-void xDCC::readData()
+void XDCC::readData()
 {
 	QDataStream in(m_ClientConnection);
 
@@ -185,7 +185,7 @@ void xDCC::readData()
 	activateWindow();
 }
 
-void xDCC::tick()
+void XDCC::tick()
 {
 	if(!m_CurrentID.isEmpty())
 	{
@@ -210,7 +210,7 @@ void xDCC::tick()
 	queueFetcher->fetch(queueUrl);
 }
 
-void xDCC::activate()
+void XDCC::activate()
 {
 	ui.tabChannels->connectToIrc(this->GetUsername());
 	connect(ui.tabChannels, SIGNAL(showMessage(QString&, int)), this, SLOT(showMessage(QString&, int)));
@@ -221,12 +221,12 @@ void xDCC::activate()
 	this->show();
 }
 
-void xDCC::showMessage(QString message, int timeout=3000)
+void XDCC::showMessage(QString message, int timeout=3000)
 {
 	ui.statusBar->showMessage(message, timeout);
 }
 
-void xDCC::handleChat()
+void XDCC::handleChat()
 {
 	QString curTab = ui.tabChannels->tabText(ui.tabChannels->currentIndex());
 	QString Message = ui.txtChatInput->text();
@@ -235,7 +235,7 @@ void xDCC::handleChat()
 	ui.tabChannels->handleChat(curTab, Message);
 }
 
-void xDCC::parseGamesXml(QString& data)
+void XDCC::parseGamesXml(QString& data)
 {
 	QXmlStreamReader xml(data);
 
@@ -319,7 +319,7 @@ void xDCC::parseGamesXml(QString& data)
 	}
 }
 
-void xDCC::parseQueueXml(QString& data)
+void XDCC::parseQueueXml(QString& data)
 {
 	QXmlStreamReader xml(data);
 
@@ -382,7 +382,7 @@ void xDCC::parseQueueXml(QString& data)
 	}
 }
 
-void xDCC::parsePlayersXml(QString& data)
+void XDCC::parsePlayersXml(QString& data)
 {
 	QXmlStreamReader xml(data);
 

@@ -69,6 +69,6 @@ int main(int argc, char *argv[])
 
 	_singular->create(1);
 
-	xDCC xdcc;
+	XDCC xdcc;
 	return a.exec();
 }

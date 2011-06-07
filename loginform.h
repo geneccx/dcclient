@@ -15,7 +15,7 @@ class LoginForm : public QDialog
 	Q_OBJECT
 
 public:
-	LoginForm(xDCC* nXDCC, QWidget *parent = 0, Qt::WFlags flags = 0);
+	LoginForm(XDCC* nXDCC, QWidget *parent = 0, Qt::WFlags flags = 0);
 	~LoginForm();
 
 public slots:
@@ -30,7 +30,7 @@ private:
 	QString Username;
 	QSettings* settings;
 
-	xDCC* m_xDCC;
+	XDCC* m_xDCC;
 };
 
 #endif // XDCC_H
