@@ -12,6 +12,7 @@
 #include <QClipboard>
 #include <QSharedPointer>
 #include <QImage>
+#include <QSettings>
 
 #include <winsparkle.h>
 
@@ -83,14 +84,10 @@ xDCC::xDCC(QWidget *parent, Qt::WFlags flags)
 
 	m_SettingsForm = new SettingsForm(this);
 
-	QImage bg;
-	if (bg.load("background.png"))
-	{
-		QPalette palette;
-		palette.setBrush(this->backgroundRole(), QBrush(bg));
+	QString background = m_Settings->value("Background", "").toString();
 
-		this->setPalette(palette);
-	}
+	if(!background.isEmpty())
+		this->setStyleSheet(QString("QWidget#centralWidget {background-image: url(%1)}").arg(background));
 }
 
 xDCC::~xDCC()

@@ -17,12 +17,14 @@ public:
 
 public slots:
 	void saveSettings();
+	void browseBackground();
 
 private:
 	Ui_SettingsForm ui;
 	QSettings* settings;
 
 	bool m_SoundOnGameStart;
+	QString m_BackgroundImage;
 };
 
 #endif // XDCC_H
