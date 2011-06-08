@@ -75,7 +75,7 @@ CGProxy::CGProxy(QWidget* parent) : QObject(parent), m_LocalSocket(0)
 
 	timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-	timer->start(30);
+	timer->start(40);
 
 	m_TotalPacketsReceivedFromLocal = 0;
 	m_TotalPacketsReceivedFromRemote = 0;
@@ -93,6 +93,7 @@ CGProxy::CGProxy(QWidget* parent) : QObject(parent), m_LocalSocket(0)
 	m_NumEmptyActionsUsed = 0;
 	m_LastAckTime = 0;
 	m_LastActionTime = 0;
+	m_LastBroadcastTime = 0;
 
 	m_RemoteSocket = new QTcpSocket(this);
 
@@ -254,9 +255,16 @@ void CGProxy::update()
 		}
 	}
 
-	for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
-		m_UDPSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
+	if(!m_LocalSocket || m_LocalSocket->state() != QTcpSocket::ConnectedState || m_RemoteSocket->state() != QTcpSocket::ConnectedState)
+	{
+		if( GetTime( ) - m_LastBroadcastTime > 3 )
+		{
+			for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
+				m_UDPSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
 
+			m_LastBroadcastTime = GetTime( );
+		}
+	}
 }
 
 void CGProxy::newConnection()
@@ -978,7 +986,14 @@ void CGProxy::parsePacket(QString IP, QByteArray datagram)
 			}
 
 			if(!DuplicateFound)
+			{
 				games.push_back(gameInfo);
+
+				for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
+					m_UDPSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
+
+				m_LastBroadcastTime = GetTime( );
+			}
 		}
 	}
 

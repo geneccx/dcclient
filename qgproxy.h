@@ -66,6 +66,7 @@ private:
 	quint32 m_LastActionTime;
 	quint32 m_LastConnectionAttemptTime;
 	quint32 m_ReconnectKey;
+	quint32 m_LastBroadcastTime;
 
 	quint16 m_ListenPort;
 	quint16 m_ReconnectPort;
