@@ -971,6 +971,10 @@ void CGProxy::parsePacket(QString IP, QByteArray datagram)
 			CGameInfo* gameInfo = m_GameProtocol->RECEIVE_W3GS_GAMEINFO(datagram);
 			gameInfo->SetIP(IP);
 
+			// custom bots
+			if(IP == "69.175.127.230" || IP == "173.236.44.42")
+				gameInfo->SetReliable(false);
+
 			bool DuplicateFound = false;
 
 			for(QVector<CGameInfo*>::iterator i = games.begin(); i != games.end(); ++i)

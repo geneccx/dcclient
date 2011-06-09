@@ -127,6 +127,7 @@ public:
 	void SetUpTime( quint32 nUpTime )				{ UpTime = nUpTime; }
 	void SetPort( quint16 nPort )					{ Port = nPort; }
 	void SetIP( QString nIP )						{ IP = nIP; }
+	void SetReliable( bool nReliable )				{ Reliable = nReliable; }
 
 	QByteArray GetPacket(quint16);
 
