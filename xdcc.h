@@ -18,6 +18,7 @@ class GameRequester;
 class CGProxy;
 class LoginForm;
 class SettingsForm;
+class ApiFetcher;
 
 struct GameInfo;
 struct QueueInfo;
@@ -90,6 +91,10 @@ private:
 	bool m_Active;
 
 	bool eventFilter(QObject *obj,  QEvent *event);
+
+	ApiFetcher* m_PlayersFetcher;
+	ApiFetcher* m_GamesFetcher;
+	ApiFetcher* m_QueueFetcher;
 };
 
 #endif // XDCC_H

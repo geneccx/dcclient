@@ -18,12 +18,11 @@
 
 #include <winsparkle.h>
 
-XDCC::XDCC(QWidget *parent, Qt::WFlags flags)
-	: QMainWindow(parent, flags)
+XDCC::XDCC(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 {
 	ui.setupUi(this);
 
-	m_Settings = new QSettings("DotaCash", "DCClient X");
+	m_Settings = new QSettings("DotaCash", "DCClient X", this);
 
 	m_Timer = new QTimer(this);
 	connect(m_Timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -261,7 +260,7 @@ void XDCC::tick()
 void XDCC::activate()
 {
 	ui.tabChannels->connectToIrc(this->GetUsername());
-	connect(ui.tabChannels, SIGNAL(showMessage(QString&, int)), this, SLOT(showMessage(QString&, int)));
+	connect(ui.tabChannels, SIGNAL(showMessage(QString, int)), this, SLOT(showMessage(QString, int)));
 
 	this->tick();
 	m_Timer->start(3000);
