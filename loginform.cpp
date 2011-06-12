@@ -48,7 +48,7 @@ void LoginForm::login()
 	ApiFetcher* fetcher = new ApiFetcher();
 	connect(fetcher, SIGNAL(fetchComplete(QString&)), this, SLOT(parseLogin(QString&)));
 
-	QString url = QString("http://www.dotacash.com/api/login.php?u=%1&p=%2").arg(Username).arg(Password);
+	QString url = QString("http://dual.dotacash.com/api/login.php?u=%1&p=%2").arg(Username).arg(Password);
 	fetcher->fetch(url);
 }
 

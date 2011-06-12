@@ -176,7 +176,7 @@ void XDCC::gameDoubleClicked(int row, int column)
 		cb->setText(txt);
 
 		ApiFetcher* safelistFetcher = new ApiFetcher(this);
-		QString safelistUrl = QString("http://www.dotacash.com/api/dccsl.php?u=%1&idLobby=%2").arg(m_SessionID).arg(id);
+		QString safelistUrl = QString("http://dual.dotacash.com/api/dccsl.php?u=%1&idLobby=%2").arg(m_SessionID).arg(id);
 		safelistFetcher->fetch(safelistUrl);
 
 		m_CGProxy->requestGame(ip);
@@ -239,7 +239,7 @@ void XDCC::tick()
 		ApiFetcher* playersFetcher = new ApiFetcher(this);
 		connect(playersFetcher, SIGNAL(fetchComplete(QString&)), this, SLOT(parsePlayersXml(QString&)));
 
-		QString playersUrl = QString("http://www.dotacash.com/api/gp.php?u=%1&l=%2").arg(m_SessionID).arg(m_CurrentID);
+		QString playersUrl = QString("http://dual.dotacash.com/api/gp.php?u=%1&l=%2").arg(m_SessionID).arg(m_CurrentID);
 		playersFetcher->fetch(playersUrl);
 	}
 
@@ -247,13 +247,13 @@ void XDCC::tick()
 	connect(gamesFetcher, SIGNAL(fetchComplete(QString&)), this, SLOT(parseGamesXml(QString&)));
 
 	m_CurrentType = ui.tabGames->currentIndex();
-	QString gamesUrl = QString("http://www.dotacash.com/api/gg.php?u=%1&t=%2").arg(m_SessionID).arg(m_CurrentType+1);
+	QString gamesUrl = QString("http://dual.dotacash.com/api/gg.php?u=%1&t=%2").arg(m_SessionID).arg(m_CurrentType+1);
 	gamesFetcher->fetch(gamesUrl);
 
 	ApiFetcher* queueFetcher = new ApiFetcher(this);
 	connect(queueFetcher, SIGNAL(fetchComplete(QString&)), this, SLOT(parseQueueXml(QString&)));
 
-	QString queueUrl = QString("http://www.dotacash.com/api/cq.php?u=%1").arg(m_SessionID);
+	QString queueUrl = QString("http://dual.dotacash.com/api/cq.php?u=%1").arg(m_SessionID);
 	queueFetcher->fetch(queueUrl);
 }
 
