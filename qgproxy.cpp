@@ -436,9 +436,72 @@ void CGProxy::readLocalPackets()
 			{
 				if( m_LocalBytes.size( ) >= length )
 				{
-					QByteArray data = QByteArray(m_LocalBytes.begin(), length);
-
+					QByteArray data = QByteArray(m_LocalBytes, length);
+					QDataStream ds(data);
+	
 					bool forward = true;
+
+					if( m_LocalBytes.at(1) == CGameProtocol :: W3GS_CHAT_TO_HOST )
+					{
+						if( data.size( ) >= 5 )
+						{
+							unsigned int i = 5;
+							unsigned char Total = data[4];
+
+							if( Total > 0 && data.size( ) >= i + Total )
+							{
+								i += Total;
+								unsigned char Flag = data[i + 1];
+								i += 2;
+
+								QString MessageString;
+
+								if( Flag == 16 && data.size( ) >= i + 1 )
+								{
+									ds.skipRawData(i);
+									MessageString = CGameProtocol :: ExtractString(ds);
+								}
+								else if( Flag == 32 && data.size( ) >= i + 5 )
+								{
+									ds.skipRawData(i+4);
+									MessageString = CGameProtocol :: ExtractString(ds);
+								}
+
+								QString Command = MessageString.toLower();
+
+								if( Command.size( ) >= 1 && Command.at(0) == '/' )
+								{
+									forward = false;
+
+									if( Command.size( ) >= 5 && Command.mid( 0, 4 ) == "/re " )
+									{
+// 										if( m_BNET->GetLoggedIn( ) )
+// 										{
+// 											//if( !m_BNET->GetReplyTarget( ).empty( ) )
+// 											{
+// 												//m_BNET->QueueChatCommand( MessageString.substr( 4 ), m_BNET->GetReplyTarget( ), true );
+// 												SendLocalChat( "Whispered to " + m_BNET->GetReplyTarget( ) + ": " + MessageString.substr( 4 ) );
+// 											}
+// 											else
+// 												SendLocalChat( "Nobody has whispered you yet." );
+// 										}
+// 										else
+// 											SendLocalChat( "You are not connected to battle.net." );
+									}
+									else if( Command == "/status" )
+									{
+										if( m_LocalSocket )
+										{
+											if( m_GameIsReliable && m_ReconnectPort > 0 )
+												SendLocalChat( "GProxy++ disconnect protection: enabled" );
+											else
+												SendLocalChat( "GProxy++ disconnect protection: disabled" );
+										}
+									}
+								}
+							}
+						}
+					}
 
 					if( forward )
 					{
