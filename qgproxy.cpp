@@ -1049,14 +1049,12 @@ void CGProxy::parsePacket(QString IP, QByteArray datagram)
 			}
 
 			if(!DuplicateFound)
-			{
 				games.push_back(gameInfo);
+			
+			for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
+				m_UDPSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
 
-				for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
-					m_UDPSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
-
-				m_LastBroadcastTime = GetTime( );
-			}
+			m_LastBroadcastTime = GetTime( );
 		}
 	}
 
