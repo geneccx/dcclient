@@ -27,7 +27,7 @@ void IrcHandler::connectToIrc(QString name)
 void IrcHandler::myCloseTab(int idx)
 {
 	QString channel = this->tabText(idx);
-	if(channel == "#dcchat" || channel == "#dotacash")
+	if(channel.startsWith("##") || channel == "#dcchat" || channel == "#dotacash")
 		return;
 
 	else
@@ -83,6 +83,10 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 		if((Command == "/join" || Command == "/j") && !Payload.isEmpty())
 		{
 			QString JoinChan = Payload.at(0);
+
+			if(JoinChan.startsWith("##"))
+				return;
+
 			irc->join(JoinChan);
 		}
 
@@ -90,14 +94,14 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 		{
 			if(Payload.isEmpty())
 			{
-				if(origin == "#dcchat" || origin == "#dotacash")
+				if(origin.startsWith("##") || origin == "#dcchat" || origin == "#dotacash")
 					return;
 
 				irc->part(origin);
 			}
 			else
 			{
-				if(Payload.at(0) == "#dcchat" || Payload.at(0) == "#dotacash")
+				if(Payload.at(0).startsWith("##") || Payload.at(0) == "#dcchat" || Payload.at(0) == "#dotacash")
 					return;
 
 				irc->part(Payload.at(0));

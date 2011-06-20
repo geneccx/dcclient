@@ -63,9 +63,6 @@ CGProxy::CGProxy(QWidget* parent) : QObject(parent), m_LocalSocket(0)
 
 	connect(m_LocalServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 
-	m_UDPSocket = new QUdpSocket(this);
-	m_UDPSocket->bind(QHostAddress::LocalHost, 6969, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
-
 	m_RequesterSocket = new QUdpSocket(this);
 	m_RequesterSocket->bind(6969, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
 
@@ -107,7 +104,7 @@ CGProxy::~CGProxy()
 	m_LocalServer->close();
 	
 	for( QVector<CGameInfo*>::iterator i = games.begin( ); i != games.end( ); ++i )
-		m_UDPSocket->writeDatagram(m_GameProtocol->SEND_W3GS_DECREATEGAME((*i)->GetUniqueGameID()), QHostAddress::Broadcast, 6112);
+		m_RequesterSocket->writeDatagram(m_GameProtocol->SEND_W3GS_DECREATEGAME((*i)->GetUniqueGameID()), QHostAddress::Broadcast, 6112);
 
 	while( !games.empty( ) )
 	{
@@ -260,7 +257,7 @@ void CGProxy::update()
 		if( GetTime( ) - m_LastBroadcastTime > 3 )
 		{
 			for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
-				m_UDPSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
+				m_RequesterSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
 
 			m_LastBroadcastTime = GetTime( );
 		}
@@ -585,7 +582,7 @@ void CGProxy::processLocalPackets()
 								if(!m_RemoteSocket->waitForConnected(3000))
 								{
 									qDebug() << "[GPROXY] player requested to join an expired game. removing from list.";
-									m_UDPSocket->writeDatagram(m_GameProtocol->SEND_W3GS_DECREATEGAME((*i)->GetUniqueGameID()), QHostAddress::Broadcast, 6112);
+									m_RequesterSocket->writeDatagram(m_GameProtocol->SEND_W3GS_DECREATEGAME((*i)->GetUniqueGameID()), QHostAddress::Broadcast, 6112);
 									delete (*i);
 									games.erase(i);
 									break;
@@ -624,7 +621,7 @@ void CGProxy::processLocalPackets()
 						if(!GameFound)
 						{
 							qDebug() << "[GPROXY] local player requested unknown game (expired?) sending decreate.";
-							m_UDPSocket->writeDatagram(m_GameProtocol->SEND_W3GS_DECREATEGAME(EntryKey), QHostAddress::Broadcast, 6112);
+							m_RequesterSocket->writeDatagram(m_GameProtocol->SEND_W3GS_DECREATEGAME(EntryKey), QHostAddress::Broadcast, 6112);
 							m_LocalSocket->disconnectFromHost();
 						}
 					}
@@ -759,7 +756,7 @@ void CGProxy::processServerPackets()
 				}
 
 				for( QVector<CGameInfo*>::iterator i = games.begin( ); i != games.end( ); ++i )
-					m_UDPSocket->writeDatagram(m_GameProtocol->SEND_W3GS_DECREATEGAME((*i)->GetUniqueGameID()), QHostAddress::Broadcast, 6112);
+					m_RequesterSocket->writeDatagram(m_GameProtocol->SEND_W3GS_DECREATEGAME((*i)->GetUniqueGameID()), QHostAddress::Broadcast, 6112);
 
 				while( !games.empty( ) )
 				{
@@ -1040,7 +1037,7 @@ void CGProxy::parsePacket(QString IP, QByteArray datagram)
 			{
 				if((*i)->GetIP() == IP && (*i)->GetPort() == gameInfo->GetPort())
 				{
-					m_UDPSocket->writeDatagram(m_GameProtocol->SEND_W3GS_DECREATEGAME((*i)->GetUniqueGameID()), QHostAddress::Broadcast, 6112);
+					m_RequesterSocket->writeDatagram(m_GameProtocol->SEND_W3GS_DECREATEGAME((*i)->GetUniqueGameID()), QHostAddress::Broadcast, 6112);
 					delete *i;
 					*i = gameInfo;
 					DuplicateFound = true;
@@ -1052,7 +1049,7 @@ void CGProxy::parsePacket(QString IP, QByteArray datagram)
 				games.push_back(gameInfo);
 			
 			for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
-				m_UDPSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
+				m_RequesterSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
 
 			m_LastBroadcastTime = GetTime( );
 		}

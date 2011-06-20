@@ -35,7 +35,6 @@ public slots:
 	void remoteDisconnected();
 
 private:
-	QUdpSocket* m_UDPSocket;
 	QUdpSocket* m_RequesterSocket;
 
 	QTcpServer* m_LocalServer;
