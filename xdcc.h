@@ -13,6 +13,7 @@
 #include <qlocalserver.h>
 #include <qlocalsocket.h>
 #include <QSettings>
+#include <QStringList>
 
 class GameRequester;
 class CGProxy;

@@ -3,6 +3,7 @@
 
 #include <QTabWidget>
 #include <QMap>
+#include <QStringList>
 
 #define IRC_STATIC
 #include <ircclient-qt/Irc>
@@ -10,6 +11,7 @@
 #include <ircclient-qt/IrcSession>
 
 class ChannelHandler;
+class FriendsHandler;
 
 class IrcHandler : public QTabWidget
 {
@@ -28,19 +30,23 @@ public slots:
 
 	void numericMessageReceived(const QString& origin, uint code, const QStringList& params);
 	void messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags);
-
 	void handleChat(QString&, QString&);
 	void myCloseTab(int);
+
+	void showTextCurrentTab(QString);
 
 signals:
 	void showMessage(QString, int timeout=3000);
 
 private:
 	Irc::Session *irc;
+	Irc::Buffer *m_Buffer;
 
-	QMap<QString, ChannelHandler*> channelMap;
+	QMap<QString, ChannelHandler*> m_ChannelMap;
+	QMap<QString, FriendsHandler*> m_FriendsMap;
 
 	QString m_Username;
+	QStringList m_Friends;
 
 	void removeTabName(QString name);
 };
