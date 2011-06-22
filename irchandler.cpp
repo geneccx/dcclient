@@ -31,7 +31,7 @@ void IrcHandler::connectToIrc(QString name)
 	irc->addAutoJoinChannel(QString("##%1").arg(m_Username));
 
 	for(int i = 0; i < m_Friends.size(); ++i)
-		irc->addAutoJoinChannel(QString("##%1").arg(m_Friends.at(i)));
+		irc->addAutoJoinChannel(QString("##%1").arg(m_Friends.at(i).toLower()));
 
 	irc->setAutoReconnectDelay(60);
 	irc->connectToServer("irc.dotacash.com", 6667);
@@ -141,11 +141,11 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 				int count = m_FriendsMap.size();
 
 				if(!count)
-					showTextCurrentTab(tr("You currently have no friends :("));
+					showTextCurrentTab(tr("You currently have no friends :("), Err);
 
 				else
 				{
-					showTextCurrentTab(tr("Your friends are:"));
+					showTextCurrentTab(tr("Your friends are:"), Sys);
 
 					for(int i = 0; i < count; ++i)
 					{
@@ -156,7 +156,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 						{
 							QString status = myFriend->GetStatus() ? tr("online") : tr("offline");
 
-							showTextCurrentTab(QString("%1: %2 - %3").arg(i+1).arg(friendName).arg(status));
+							showTextCurrentTab(QString("%1: %2 - %3").arg(i+1).arg(friendName).arg(status), Sys);
 						}
 					}
 				}
@@ -165,22 +165,22 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 			else if(Payload.at(0) == "a")
 			{
 				if(Payload.length() == 1)
-					showTextCurrentTab(tr("You need to supply the name of the friend you wish to add to your list."));
+					showTextCurrentTab(tr("You need to supply the name of the friend you wish to add to your list."), Err);
 				else
 				{
-					QString friendName = Payload.at(1);
+					QString friendName = Payload.at(1).toLower();
 
 					if(m_Friends.contains(friendName, Qt::CaseInsensitive))
-						showTextCurrentTab(tr("%1 is already in your friends list.").arg(friendName));
+						showTextCurrentTab(tr("%1 is already in your friends list.").arg(friendName), Err);
 					else if(friendName.toLower() == m_Username.toLower())
-						showTextCurrentTab(tr("You cannot add yourself your friends list."));
+						showTextCurrentTab(tr("You cannot add yourself your friends list."), Err);
 					else
 					{
 						m_Friends << friendName;
 						irc->join(QString("##%1").arg(friendName));
 
 						QSettings("DotaCash", "DCClient X", this).setValue("Friends", m_Friends.join(";"));
-						showTextCurrentTab(tr("Added %1 to your friends list.").arg(friendName));
+						showTextCurrentTab(tr("Added %1 to your friends list.").arg(friendName), Sys);
 					}
 				}
 			}
@@ -188,13 +188,13 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 			else if(Payload.at(0) == "r")
 			{
 				if(Payload.length() == 1)
-					showTextCurrentTab(tr("You need to supply the name of the friend you wish to remove from your list."));
+					showTextCurrentTab(tr("You need to supply the name of the friend you wish to remove from your list."), Err);
 				else
 				{
-					QString friendName = Payload.at(1);
+					QString friendName = Payload.at(1).toLower();
 
 					if(!m_Friends.contains(friendName, Qt::CaseInsensitive))
-						showTextCurrentTab(tr("%1 is not in your friends list.").arg(friendName));
+						showTextCurrentTab(tr("%1 is not in your friends list.").arg(friendName), Err);
 					else
 					{
 						int idx = m_Friends.indexOf(friendName);
@@ -206,7 +206,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 						m_FriendsMap.remove(friendName.toLower());
 
 						QSettings("DotaCash", "DCClient X", this).setValue("Friends", m_Friends.join(";"));
-						showTextCurrentTab(tr("Removed %1 from your friends list.").arg(friendName));
+						showTextCurrentTab(tr("Removed %1 from your friends list.").arg(friendName), Sys);
 					}
 				}
 			}
@@ -214,7 +214,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 			else if(Payload.at(0) == "m" || Payload.at(0) == "msg")
 			{
 				if(Payload.length() == 1)
-					showTextCurrentTab(tr("What do you want to say?"));
+					showTextCurrentTab(tr("What do you want to say?"), Err);
 				else
 				{
 					if(m_Buffer)
@@ -223,7 +223,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 						QString msg = Payload.join(" ");
 
 						m_Buffer->message(msg);
-						showTextCurrentTab(tr("You whisper to your friends: %1").arg(msg));
+						showTextCurrentTab(tr("You whisper to your friends: %1").arg(msg), Sys);
 					}
 				}
 			}
@@ -231,8 +231,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 
 		else
 		{
-			if(channel)
-				channel->showText(tr("Invalid command."));
+			showTextCurrentTab(tr("Invalid command."), Err);
 		}
 	}
 
@@ -285,8 +284,7 @@ void IrcHandler::irc_buffer_added(Irc::Buffer *buffer)
 
 void IrcHandler::irc_buffer_removed(Irc::Buffer *buffer)
 {
-	QString name = buffer->receiver();
-	removeTabName(name);
+	removeTabName(buffer->receiver());
 }
 
 void IrcHandler::messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags)
@@ -324,7 +322,8 @@ void IrcHandler::removeTabName(QString name)
 
 		chan->GetBuffer()->deleteLater();
 		delete chan;
-		m_ChannelMap[name.toLower()] = NULL;
+
+		m_ChannelMap.remove(name.toLower());
 	}
 }
 
@@ -365,11 +364,53 @@ void IrcHandler::numericMessageReceived(const QString& origin, uint code, const 
 	}
 }
 
-void IrcHandler::showTextCurrentTab(QString message)
+void IrcHandler::showTextCurrentTab(QString message, MessageType msgType)
 {
 	QString channel = this->tabText(this->currentIndex());
 	ChannelHandler* handler = m_ChannelMap[channel.toLower()];
 
+	QString spanClass;
+
+	switch(msgType)
+	{
+		
+		case Err: spanClass = "err"; break;
+		case Friends: spanClass = "fmsg"; break;
+		case Sys: spanClass = "sysmsg"; break;
+
+		default:
+		case Normal: spanClass = "msg";
+	}
+
 	if(handler)
-		handler->showText(message);
+		handler->showText(QString("<span class=\"%1\">%2</span>").arg(spanClass).arg(message));
+}
+
+void IrcHandler::reloadSkin()
+{
+	for(int i = 0; i < m_ChannelMap.count(); ++i)
+	{
+		ChannelHandler* handler = m_ChannelMap.values().at(i);
+
+		if(handler)
+			handler->reloadSkin();
+	}
+}
+
+void IrcHandler::joinedGame(QString ip, QString gameName)
+{
+	if(m_Buffer)
+	{
+		m_Buffer->notice(QString("xdcc://%1;%2").arg(ip).arg(gameName));
+	}
+}
+
+void IrcHandler::handleUrl(QUrl url)
+{
+	QString data = url.toString();
+	
+	if(data.startsWith("xdcc://"))
+	{
+		emit requestGame(data.mid(7));
+	}
 }

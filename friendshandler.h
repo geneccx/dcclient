@@ -32,7 +32,8 @@ public slots:
 	void noticeReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags=Irc::Buffer::NoFlags);
 
 signals:
-	void showMessage(QString);
+	void showMessage(QString, MessageType msgType = Normal);
+	void requestGame(QString);
 
 private:
 	Irc::Buffer* m_Buffer;

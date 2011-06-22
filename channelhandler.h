@@ -23,6 +23,7 @@ public:
 	void showText(QString msg) { txtChat->append(msg); }
 	void message(QString msg) { if(m_Buffer) m_Buffer->message(msg); }
 	void UpdateNames();
+	void reloadSkin();
 
 public slots:
 	void joined(const QString);

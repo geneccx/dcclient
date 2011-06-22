@@ -1,3 +1,3 @@
 #ifndef XDCC_VERSION
-#define XDCC_VERSION "1.6.3\0"
+#define XDCC_VERSION "1.7.0\0"
 #endif

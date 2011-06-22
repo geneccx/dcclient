@@ -4,6 +4,7 @@
 #include <QTabWidget>
 #include <QMap>
 #include <QStringList>
+#include <QUrl>
 
 #define IRC_STATIC
 #include <ircclient-qt/Irc>
@@ -12,6 +13,14 @@
 
 class ChannelHandler;
 class FriendsHandler;
+
+enum MessageType
+{
+	Normal,
+	Sys,
+	Err,
+	Friends
+};
 
 class IrcHandler : public QTabWidget
 {
@@ -33,10 +42,15 @@ public slots:
 	void handleChat(QString&, QString&);
 	void myCloseTab(int);
 
-	void showTextCurrentTab(QString);
+	void showTextCurrentTab(QString, MessageType=Normal);
+	void reloadSkin();
+
+	void joinedGame(QString, QString);
+	void handleUrl(QUrl);
 
 signals:
 	void showMessage(QString, int timeout=3000);
+	void requestGame(QString);
 
 private:
 	Irc::Session *irc;

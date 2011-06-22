@@ -34,6 +34,9 @@ public slots:
 	void localDisconnected();
 	void remoteDisconnected();
 
+signals:
+	void joinedGame(QString, QString);
+
 private:
 	QUdpSocket* m_RequesterSocket;
 

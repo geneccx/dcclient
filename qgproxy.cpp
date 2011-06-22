@@ -614,6 +614,8 @@ void CGProxy::processLocalPackets()
 								Data = DataRewritten;
 
 								GameFound = true;
+
+								emit joinedGame((*i)->GetIP(), (*i)->GetGameName());
 								break;
 							}
 						}

@@ -63,6 +63,8 @@ public slots:
 	void showAbout();
 	void showSettings();
 
+	void requestGame(QString IP);
+
 private:
 	Ui::xDCCClass ui;
 	LoginForm* m_LoginForm;

@@ -14,6 +14,9 @@ SettingsForm::SettingsForm(QWidget *parent, Qt::WFlags flags)
 	m_SoundOnGameStart = settings->value("GameStartedSound", true).toBool();
  	ui.optionSoundGameStart->setCheckState(m_SoundOnGameStart ? Qt::Checked : Qt::Unchecked);
 
+	m_FriendFollow = settings->value("FriendFollow", true).toBool();
+	ui.optionFriendFollow->setCheckState(m_FriendFollow ? Qt::Checked : Qt::Unchecked);
+
 	m_Skin = settings->value("Skin", "default").toString();
 
 	QDir skinsDir("./skins/");
@@ -21,7 +24,7 @@ SettingsForm::SettingsForm(QWidget *parent, Qt::WFlags flags)
 	ui.cmbSkin->addItems(skinsList);
 
 	int idx = ui.cmbSkin->findText(m_Skin);
-	
+
 	if(idx != -1)
 		ui.cmbSkin->setCurrentIndex(idx);
 }
@@ -35,6 +38,9 @@ void SettingsForm::saveSettings()
 {
 	m_SoundOnGameStart = ui.optionSoundGameStart->isChecked();
 	settings->setValue("GameStartedSound", m_SoundOnGameStart);
+
+	m_FriendFollow = ui.optionFriendFollow->isChecked();
+	settings->setValue("FriendFollow", m_FriendFollow);
 
 	m_Skin = ui.cmbSkin->currentText();
 	settings->setValue("Skin", m_Skin);
@@ -50,6 +56,8 @@ void SettingsForm::saveSettings()
 
 		QMainWindow* parent = (QMainWindow*)this->parent();
 		parent->setStyleSheet(style);
+
+		emit reloadSkin();
 	}
 
 	this->close();

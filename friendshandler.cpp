@@ -6,7 +6,10 @@ FriendsHandler::FriendsHandler(Irc::Buffer* nBuffer, QString nFriendName, QWidge
 	m_Status = false;
 
 	if(parent)
-		connect(this, SIGNAL(showMessage(QString)), parent, SLOT(showTextCurrentTab(QString)));
+	{
+		connect(this, SIGNAL(showMessage(QString, MessageType)), parent, SLOT(showTextCurrentTab(QString, MessageType)));
+		connect(this, SIGNAL(requestGame(QString)), parent, SIGNAL(requestGame(QString)));
+	}
 
 	if(m_Buffer)
 	{
@@ -32,7 +35,7 @@ void FriendsHandler::joined(const QString user)
 	{
 		m_Status = true;
 
-		emit showMessage(tr("Your friend %1 is now online.").arg(user));
+		emit showMessage(tr("Your friend %1 is now online.").arg(user), Friends);
 	}
 }
 
@@ -42,7 +45,7 @@ void FriendsHandler::parted(const QString user, const QString reason)
 	{
 		m_Status = false;
 
-		emit showMessage(tr("Your friend %1 is now offline.").arg(user));
+		emit showMessage(tr("Your friend %1 is now offline.").arg(user), Friends);
 	}
 }
 
@@ -50,7 +53,7 @@ void FriendsHandler::messageReceived(const QString &origin, const QString &messa
 {
 	if(origin.toLower() == m_FriendName.toLower())
 	{
-		emit showMessage(tr("[FRIENDS] <%1> %2").arg(origin).arg(message));
+		emit showMessage(QString("&lt;%1&gt; %2").arg(origin).arg(message), Friends);
 	}
 }
 
@@ -58,6 +61,18 @@ void FriendsHandler::noticeReceived(const QString &origin, const QString &messag
 {
 	if(origin.toLower() == m_FriendName.toLower())
 	{
+		if(message.startsWith("xdcc://"))
+		{
+			int idx = message.indexOf(";");
 
+			QString IP = message.mid(7).left(idx-7);
+			QString gameName = message.mid(idx+1);
+			
+			emit showMessage(tr("Your friend %1 has joined the game <a href=xdcc://%2>%3</a>").arg(origin).arg(IP).arg(gameName), Friends);
+
+			QSettings settings("DotaCash", "DCClient X");
+			if(settings.value("FriendFollow", true).toBool())
+				emit requestGame(IP);
+		}
 	}
 }

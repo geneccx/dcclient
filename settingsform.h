@@ -18,11 +18,15 @@ public:
 public slots:
 	void saveSettings();
 
+signals:
+	void reloadSkin();
+
 private:
 	Ui_SettingsForm ui;
 	QSettings* settings;
 
 	bool m_SoundOnGameStart;
+	bool m_FriendFollow;
 	QString m_Skin;
 };
 

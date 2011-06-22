@@ -85,6 +85,8 @@ XDCC::XDCC(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 
 	m_SettingsForm = new SettingsForm(this);
 
+	connect(m_CGProxy, SIGNAL(joinedGame(QString, QString)), ui.tabChannels, SLOT(joinedGame(QString, QString)));
+
  	m_Skin = m_Settings->value("Skin", "default").toString();
  
 	QFile styleSheet(QString("./skins/%1/style.css").arg(m_Skin));
@@ -175,11 +177,7 @@ void XDCC::gameDoubleClicked(int row, int column)
 		QClipboard *cb = QApplication::clipboard();
 		cb->setText(txt);
 
-		ApiFetcher* safelistFetcher = new ApiFetcher(this);
-		QString safelistUrl = QString("http://dual.dotacash.com/api/dccsl.php?u=%1&idLobby=%2").arg(m_SessionID).arg(id);
-		safelistFetcher->fetch(safelistUrl);
-
-		m_CGProxy->requestGame(ip);
+		requestGame(ip);
 
 		ui.statusBar->showMessage(tr("%1 copied to clipboard and is now visible in LAN screen.").arg(txt), 3000);
 	}
@@ -261,6 +259,8 @@ void XDCC::activate()
 {
 	ui.tabChannels->connectToIrc(this->GetUsername());
 	connect(ui.tabChannels, SIGNAL(showMessage(QString, int)), this, SLOT(showMessage(QString, int)));
+	connect(m_SettingsForm, SIGNAL(reloadSkin()), ui.tabChannels, SLOT(reloadSkin()));
+	connect(ui.tabChannels, SIGNAL(requestGame(QString)), this , SLOT(requestGame(QString)));
 
 	this->tick();
 	m_Timer->start(3000);
@@ -544,4 +544,13 @@ void XDCC::parsePlayersXml(QString& data)
 			ui.tblPlayers->setItem(i, 5, itemWins);
 		}
 	}
+}
+
+void XDCC::requestGame(QString IP)
+{
+	ApiFetcher* safelistFetcher = new ApiFetcher(this);
+	QString safelistUrl = QString("http://dual.dotacash.com/api/dccslip.php?u=%1&botip=%2").arg(m_SessionID).arg(IP);
+	safelistFetcher->fetch(safelistUrl);
+
+	m_CGProxy->requestGame(IP);
 }
