@@ -39,7 +39,7 @@
    </property>
    <property name="url">
     <url>
-     <string>http://dual.dotacash.com/api/news.php</string>
+     <string>file:///X:/dotacash/xdcc</string>
     </url>
    </property>
   </widget>

@@ -1,6 +1,7 @@
 #include "loginform.h"
 #include "xdcc.h"
 #include "dcapifetcher.h"
+#include "xdcc_version.h"
 
 #include <QDebug>
 #include <QMap>
@@ -22,6 +23,8 @@ LoginForm::LoginForm(XDCC* nxDCC, QWidget *parent, Qt::WFlags flags)
 		ui.txtUsername->setText(oldUsername);
 		ui.txtPassword->setFocus();
 	}
+
+	ui.webNews->setUrl(QUrl("http://" + API_SERVER + "/api/news.php"));
 }
 
 LoginForm::~LoginForm()
@@ -48,7 +51,7 @@ void LoginForm::login()
 	ApiFetcher* fetcher = new ApiFetcher();
 	connect(fetcher, SIGNAL(fetchComplete(QString&)), this, SLOT(parseLogin(QString&)));
 
-	QString url = QString("http://dual.dotacash.com/api/login.php?u=%1&p=%2").arg(Username).arg(Password);
+	QString url = "http://" + API_SERVER + QString("/api/login.php?u=%1&p=%2").arg(Username).arg(Password);
 	fetcher->fetch(url);
 }
 
