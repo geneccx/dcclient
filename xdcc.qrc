@@ -2,7 +2,6 @@
     <qresource prefix="/xDCC">
         <file>software-update-available.ico</file>
         <file>software-update-available.png</file>
-        <file>GameStarted.wav</file>
     </qresource>
     <qresource prefix="/lang"/>
 </RCC>
