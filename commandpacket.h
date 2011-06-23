@@ -37,8 +37,8 @@ public:
 	~CCommandPacket( );
 
 	unsigned char GetPacketType( )	{ return m_PacketType; }
-	int GetID( )					{ return m_ID; }
-	QByteArray GetData( )			{ return m_Data; }
+	int GetID( )			{ return m_ID; }
+	QByteArray GetData( )		{ return m_Data; }
 };
 
 #endif

@@ -51,6 +51,8 @@ void FriendsHandler::parted(const QString user, const QString reason)
 
 void FriendsHandler::messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags)
 {
+	Q_UNUSED(flags);
+
 	if(origin.toLower() == m_FriendName.toLower())
 	{
 		emit showMessage(QString("&lt;%1&gt; %2").arg(origin).arg(message), Friends);
@@ -59,6 +61,8 @@ void FriendsHandler::messageReceived(const QString &origin, const QString &messa
 
 void FriendsHandler::noticeReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags)
 {
+	Q_UNUSED(flags);
+
 	if(origin.toLower() == m_FriendName.toLower())
 	{
 		if(message.startsWith("xdcc://"))
@@ -67,7 +71,7 @@ void FriendsHandler::noticeReceived(const QString &origin, const QString &messag
 
 			QString IP = message.mid(7).left(idx-7);
 			QString gameName = message.mid(idx+1);
-			
+
 			emit showMessage(tr("Your friend %1 has joined the game <a href=xdcc://%2>%3</a>").arg(origin).arg(IP).arg(gameName), Friends);
 
 			QSettings settings("DotaCash", "DCClient X");

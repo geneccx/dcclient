@@ -95,14 +95,14 @@ CGProxy::CGProxy(QWidget* parent) : QObject(parent), m_LocalSocket(0)
 	m_RemoteSocket = new QTcpSocket(this);
 
 	connect(m_RemoteSocket, SIGNAL(disconnected()),
-		this, SLOT(remoteDisconnected()));
+			this, SLOT(remoteDisconnected()));
 	connect(m_RemoteSocket, SIGNAL(readyRead()), this, SLOT(readServerPackets()));
 }
 
 CGProxy::~CGProxy()
 {
 	m_LocalServer->close();
-	
+
 	for( QVector<CGameInfo*>::iterator i = games.begin( ); i != games.end( ); ++i )
 		m_RequesterSocket->writeDatagram(m_GameProtocol->SEND_W3GS_DECREATEGAME((*i)->GetUniqueGameID()), QHostAddress::Broadcast, 6112);
 
@@ -172,7 +172,7 @@ void CGProxy::update()
 					SendLocalChat( "You have been disconnected from the server." );
 					quint32 TimeRemaining = ( m_NumEmptyActions - m_NumEmptyActionsUsed + 1 ) * 60 - ( GetTime( ) - m_LastActionTime );
 
-					if( GetTime( ) - m_LastActionTime > ( m_NumEmptyActions - m_NumEmptyActionsUsed + 1 ) * 60 )
+					if( GetTime( ) - m_LastActionTime > quint32( m_NumEmptyActions - m_NumEmptyActionsUsed + 1 ) * 60 )
 						TimeRemaining = 0;
 
 					SendLocalChat( tr("GProxy++ is attempting to reconnect... (%1 seconds remain)").arg(TimeRemaining) );
@@ -235,7 +235,7 @@ void CGProxy::update()
 				{
 					quint32 TimeRemaining = ( m_NumEmptyActions - m_NumEmptyActionsUsed + 1 ) * 60 - ( GetTime( ) - m_LastActionTime );
 
-					if( GetTime( ) - m_LastActionTime > ( m_NumEmptyActions - m_NumEmptyActionsUsed + 1 ) * 60 )
+					if( GetTime( ) - m_LastActionTime > quint32( m_NumEmptyActions - m_NumEmptyActionsUsed + 1 ) * 60 )
 						TimeRemaining = 0;
 
 					SendLocalChat( tr("GProxy++ is attempting to reconnect... (%1 seconds remain)").arg(TimeRemaining) );
@@ -314,10 +314,10 @@ void CGProxy::newConnection()
 	m_LocalSocket = newClient;
 
 	connect(m_LocalSocket, SIGNAL(disconnected()),
-		this, SLOT(localDisconnected()));
+			this, SLOT(localDisconnected()));
 
 	connect(m_LocalSocket, SIGNAL(disconnected()),
-		m_LocalSocket, SLOT(deleteLater()));
+			m_LocalSocket, SLOT(deleteLater()));
 
 	connect(m_LocalSocket, SIGNAL(readyRead()), this, SLOT(readLocalPackets()));
 }
@@ -397,7 +397,7 @@ void CGProxy::remoteDisconnected()
 		SendLocalChat( "You have been disconnected from the server due to a socket error." );
 		quint32 TimeRemaining = ( m_NumEmptyActions - m_NumEmptyActionsUsed + 1 ) * 60 - ( GetTime( ) - m_LastActionTime );
 
-		if( GetTime( ) - m_LastActionTime > ( m_NumEmptyActions - m_NumEmptyActionsUsed + 1 ) * 60 )
+		if( GetTime( ) - m_LastActionTime > quint32( m_NumEmptyActions - m_NumEmptyActionsUsed + 1 ) * 60 )
 			TimeRemaining = 0;
 
 		SendLocalChat( tr("GProxy++ is attempting to reconnect... (%1 seconds remain)").arg(TimeRemaining) );
@@ -428,22 +428,22 @@ void CGProxy::readLocalPackets()
 			LengthBytes.push_back( m_LocalBytes[2] );
 			LengthBytes.push_back( m_LocalBytes[3] );
 			quint16 length = qFromLittleEndian<quint16>((uchar*)LengthBytes.data());
-			
+
 			if(length >= 4)
 			{
 				if( m_LocalBytes.size( ) >= length )
 				{
 					QByteArray data = QByteArray(m_LocalBytes, length);
 					QDataStream ds(data);
-	
+
 					bool forward = true;
 
 					if( m_LocalBytes.at(1) == CGameProtocol :: W3GS_CHAT_TO_HOST )
 					{
 						if( data.size( ) >= 5 )
 						{
-							unsigned int i = 5;
-							unsigned char Total = data[4];
+							int i = 5;
+							char Total = data[4];
 
 							if( Total > 0 && data.size( ) >= i + Total )
 							{
@@ -472,18 +472,18 @@ void CGProxy::readLocalPackets()
 
 									if( Command.size( ) >= 5 && Command.mid( 0, 4 ) == "/re " )
 									{
-// 										if( m_BNET->GetLoggedIn( ) )
-// 										{
-// 											//if( !m_BNET->GetReplyTarget( ).empty( ) )
-// 											{
-// 												//m_BNET->QueueChatCommand( MessageString.substr( 4 ), m_BNET->GetReplyTarget( ), true );
-// 												SendLocalChat( "Whispered to " + m_BNET->GetReplyTarget( ) + ": " + MessageString.substr( 4 ) );
-// 											}
-// 											else
-// 												SendLocalChat( "Nobody has whispered you yet." );
-// 										}
-// 										else
-// 											SendLocalChat( "You are not connected to battle.net." );
+										// 										if( m_BNET->GetLoggedIn( ) )
+										// 										{
+										// 											//if( !m_BNET->GetReplyTarget( ).empty( ) )
+										// 											{
+										// 												//m_BNET->QueueChatCommand( MessageString.substr( 4 ), m_BNET->GetReplyTarget( ), true );
+										// 												SendLocalChat( "Whispered to " + m_BNET->GetReplyTarget( ) + ": " + MessageString.substr( 4 ) );
+										// 											}
+										// 											else
+										// 												SendLocalChat( "Nobody has whispered you yet." );
+										// 										}
+										// 										else
+										// 											SendLocalChat( "You are not connected to battle.net." );
 									}
 									else if( Command == "/status" )
 									{
@@ -675,7 +675,7 @@ void CGProxy::readServerPackets()
 			{
 				if( m_RemoteBytes.size( ) >= length )
 				{
-				
+
 					QByteArray data = QByteArray(m_RemoteBytes.begin(), length);
 					m_RemotePackets.push_back(new CCommandPacket( m_RemoteBytes.at(0), m_RemoteBytes.at(1), data ));
 
@@ -782,12 +782,12 @@ void CGProxy::processServerPackets()
 					// note: the lag screen can't be up right now otherwise the server made a big mistake, so we don't need to check for it
 
 					QByteArray EmptyAction;
-					EmptyAction.push_back( 0xF7 );
-					EmptyAction.push_back( 0x0C );
-					EmptyAction.push_back( 0x06 );
-					EmptyAction.push_back( (char)0x00 );
-					EmptyAction.push_back( (char)0x00 );
-					EmptyAction.push_back( (char)0x00 );
+					EmptyAction.append( (char)0xF7 );
+					EmptyAction.append( (char)0x0C );
+					EmptyAction.append( (char)0x06 );
+					EmptyAction.append( (char)0x00 );
+					EmptyAction.append( (char)0x00 );
+					EmptyAction.append( (char)0x00 );
 
 					for( unsigned char i = m_NumEmptyActionsUsed; i < m_NumEmptyActions; i++ )
 						m_LocalSocket->write( EmptyAction );
@@ -872,12 +872,12 @@ void CGProxy::processServerPackets()
 					// note: the lag screen can't be up right now otherwise the server made a big mistake, so we don't need to check for it
 
 					QByteArray EmptyAction;
-					EmptyAction.push_back( 0xF7 );
-					EmptyAction.push_back( 0x0C );
-					EmptyAction.push_back( 0x06 );
-					EmptyAction.push_back( (char)0x00 );
-					EmptyAction.push_back( (char)0x00 );
-					EmptyAction.push_back( (char)0x00 );
+					EmptyAction.append( (char)0xF7 );
+					EmptyAction.append( (char)0x0C );
+					EmptyAction.append( (char)0x06 );
+					EmptyAction.append( (char)0x00 );
+					EmptyAction.append( (char)0x00 );
+					EmptyAction.append( (char)0x00 );
 
 					for( unsigned char i = m_NumEmptyActionsUsed; i < m_NumEmptyActions; i++ )
 						m_LocalSocket->write( EmptyAction );
@@ -923,7 +923,7 @@ void CGProxy::processServerPackets()
 
 					if( LastPacket > PacketsAlreadyUnqueued )
 					{
-						quint32 PacketsToUnqueue = LastPacket - PacketsAlreadyUnqueued;
+						int PacketsToUnqueue = LastPacket - PacketsAlreadyUnqueued;
 
 						if( PacketsToUnqueue > m_PacketBuffer.size( ) )
 						{
@@ -969,7 +969,7 @@ void CGProxy::processServerPackets()
 
 					if( LastPacket > PacketsAlreadyUnqueued )
 					{
-						quint32 PacketsToUnqueue = LastPacket - PacketsAlreadyUnqueued;
+						int PacketsToUnqueue = LastPacket - PacketsAlreadyUnqueued;
 
 						if( PacketsToUnqueue > m_PacketBuffer.size( ) )
 						{
@@ -1049,7 +1049,7 @@ void CGProxy::parsePacket(QString IP, QByteArray datagram)
 
 			if(!DuplicateFound)
 				games.push_back(gameInfo);
-			
+
 			for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
 				m_RequesterSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
 
@@ -1106,12 +1106,12 @@ void CGProxy::SendEmptyAction( )
 
 	QByteArray EmptyAction;
 
-	EmptyAction.push_back( 0xF7 );
-	EmptyAction.push_back( 0x0C );
-	EmptyAction.push_back( 0x06 );
-	EmptyAction.push_back( (char)0x00 );
-	EmptyAction.push_back( (char)0x00 );
-	EmptyAction.push_back( (char)0x00 );
+	EmptyAction.append( (char)0xF7 );
+	EmptyAction.append( (char)0x0C );
+	EmptyAction.append( (char)0x06 );
+	EmptyAction.append( (char)0x00 );
+	EmptyAction.append( (char)0x00 );
+	EmptyAction.append( (char)0x00 );
 	m_LocalSocket->write( EmptyAction );
 
 	if( !m_Laggers.empty( ) )

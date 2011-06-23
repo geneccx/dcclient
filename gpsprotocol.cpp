@@ -44,10 +44,10 @@ CGPSProtocol :: ~CGPSProtocol( )
 QByteArray CGPSProtocol :: SEND_GPSC_INIT( quint32 version )
 {
 	QByteArray packet;
-	packet.push_back( GPS_HEADER_CONSTANT );
-	packet.push_back( GPS_INIT );
-	packet.push_back( (char)0 );
-	packet.push_back( (char)0 );
+	packet.append( (char)GPS_HEADER_CONSTANT );
+	packet.append( (char)GPS_INIT );
+	packet.append( (char)0 );
+	packet.append( (char)0 );
 	packet.append( (char*)&version, 4 );
 	AssignLength( packet );
 
@@ -57,11 +57,11 @@ QByteArray CGPSProtocol :: SEND_GPSC_INIT( quint32 version )
 QByteArray CGPSProtocol :: SEND_GPSC_RECONNECT( quint8 PID, quint32 reconnectKey, quint32 lastPacket )
 {
 	QByteArray packet;
-	packet.push_back( GPS_HEADER_CONSTANT );
-	packet.push_back( GPS_RECONNECT );
-	packet.push_back( (char)0 );
-	packet.push_back( (char)0 );
-	packet.push_back( PID );
+	packet.append( (char)GPS_HEADER_CONSTANT );
+	packet.append( (char)GPS_RECONNECT );
+	packet.append( (char)0 );
+	packet.append( (char)0 );
+	packet.append( (char)PID );
 	packet.append( (char*)&reconnectKey, 4 );
 	packet.append( (char*)&lastPacket, 4 );
 	AssignLength( packet );
@@ -71,10 +71,10 @@ QByteArray CGPSProtocol :: SEND_GPSC_RECONNECT( quint8 PID, quint32 reconnectKey
 QByteArray CGPSProtocol :: SEND_GPSC_ACK( quint32 lastPacket )
 {
 	QByteArray packet;
-	packet.push_back( GPS_HEADER_CONSTANT );
-	packet.push_back( GPS_ACK );
-	packet.push_back( (char)0 );
-	packet.push_back( (char)0 );
+	packet.append( (char)GPS_HEADER_CONSTANT );
+	packet.append( (char)GPS_ACK );
+	packet.append( (char)0 );
+	packet.append( (char)0 );
 	packet.append( (char*)&lastPacket, 4 );
 	AssignLength( packet );
 	return packet;
@@ -83,12 +83,12 @@ QByteArray CGPSProtocol :: SEND_GPSC_ACK( quint32 lastPacket )
 QByteArray CGPSProtocol :: SEND_GPSS_INIT( quint16 reconnectPort, quint8 PID, quint32 reconnectKey, quint8 numEmptyActions )
 {
 	QByteArray packet;
-	packet.push_back( GPS_HEADER_CONSTANT );
-	packet.push_back( GPS_INIT );
-	packet.push_back( (char)0 );
-	packet.push_back( (char)0 );
+	packet.append( (char)GPS_HEADER_CONSTANT );
+	packet.append( (char)GPS_INIT );
+	packet.append( (char)0 );
+	packet.append( (char)0 );
 	packet.append( (char*)&reconnectPort, 2 );
-	packet.push_back( PID );
+	packet.append( (char)PID );
 	packet.append( (char*)&reconnectKey, 4 );
 	packet.push_back( numEmptyActions );
 	AssignLength( packet );
@@ -98,10 +98,10 @@ QByteArray CGPSProtocol :: SEND_GPSS_INIT( quint16 reconnectPort, quint8 PID, qu
 QByteArray CGPSProtocol :: SEND_GPSS_RECONNECT( quint32 lastPacket )
 {
 	QByteArray packet;
-	packet.push_back( GPS_HEADER_CONSTANT );
-	packet.push_back( GPS_RECONNECT );
-	packet.push_back( (char)0 );
-	packet.push_back( (char)0 );
+	packet.append( (char)GPS_HEADER_CONSTANT );
+	packet.append( (char)GPS_RECONNECT );
+	packet.append( (char)0 );
+	packet.append( (char)0 );
 	packet.append( (char*)&lastPacket, 4 );
 	AssignLength( packet );
 	return packet;
@@ -110,10 +110,10 @@ QByteArray CGPSProtocol :: SEND_GPSS_RECONNECT( quint32 lastPacket )
 QByteArray CGPSProtocol :: SEND_GPSS_ACK( quint32 lastPacket )
 {
 	QByteArray packet;
-	packet.push_back( GPS_HEADER_CONSTANT );
-	packet.push_back( GPS_ACK );
-	packet.push_back( (char)0 );
-	packet.push_back( (char)0 );
+	packet.append( (char)GPS_HEADER_CONSTANT );
+	packet.append( (char)GPS_ACK );
+	packet.append( (char)0 );
+	packet.append( (char)0 );
 	packet.append( (char*)&lastPacket, 4 );
 	AssignLength( packet );
 	return packet;
@@ -122,10 +122,10 @@ QByteArray CGPSProtocol :: SEND_GPSS_ACK( quint32 lastPacket )
 QByteArray CGPSProtocol :: SEND_GPSS_REJECT( quint32 reason )
 {
 	QByteArray packet;
-	packet.push_back( GPS_HEADER_CONSTANT );
-	packet.push_back( GPS_REJECT );
-	packet.push_back( (char)0 );
-	packet.push_back( (char)0 );
+	packet.append( (char)GPS_HEADER_CONSTANT );
+	packet.append( (char)GPS_REJECT );
+	packet.append( (char)0 );
+	packet.append( (char)0 );
 	packet.append( (char*)&reason, 4 );
 	AssignLength( packet );
 	return packet;

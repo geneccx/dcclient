@@ -63,7 +63,7 @@ void IrcHandler::irc_disconnected()
 	{
 		irc_buffer_removed(irc->buffers().at(i));
 		irc->buffers().at(i);
-	}	
+	}
 
 	for(int i = 0; i < m_ChannelMap.size(); ++i)
 	{
@@ -289,8 +289,10 @@ void IrcHandler::irc_buffer_removed(Irc::Buffer *buffer)
 
 void IrcHandler::messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags)
 {
+	Q_UNUSED(flags);
+
 	ChannelHandler* handler = m_ChannelMap[origin.toLower()];
-	
+
 	if(!handler)
 	{
 		handler = new ChannelHandler(NULL, this);
@@ -298,7 +300,7 @@ void IrcHandler::messageReceived(const QString &origin, const QString &message, 
 		m_ChannelMap[origin.toLower()] = handler;
 
 		this->addTab(handler->GetTab(), origin);
-		this->setCurrentIndex(this->count() - 1);		
+		this->setCurrentIndex(this->count() - 1);
 	}
 
 	QString txt = QString("<%1> %2").arg(origin).arg(message);
@@ -329,6 +331,8 @@ void IrcHandler::removeTabName(QString name)
 
 void IrcHandler::numericMessageReceived(const QString& origin, uint code, const QStringList& params)
 {
+	Q_UNUSED(origin);
+
 	if(code == Irc::Rfc::ERR_NICKNAMEINUSE)
 	{
 		emit showMessage(tr("Nickname in use! Trying alternative nickname."));
@@ -373,13 +377,13 @@ void IrcHandler::showTextCurrentTab(QString message, MessageType msgType)
 
 	switch(msgType)
 	{
-		
-		case Err: spanClass = "err"; break;
-		case Friends: spanClass = "fmsg"; break;
-		case Sys: spanClass = "sysmsg"; break;
 
-		default:
-		case Normal: spanClass = "msg";
+	case Err: spanClass = "err"; break;
+	case Friends: spanClass = "fmsg"; break;
+	case Sys: spanClass = "sysmsg"; break;
+
+	default:
+	case Normal: spanClass = "msg";
 	}
 
 	if(handler)
@@ -408,7 +412,7 @@ void IrcHandler::joinedGame(QString ip, QString gameName)
 void IrcHandler::handleUrl(QUrl url)
 {
 	QString data = url.toString();
-	
+
 	if(data.startsWith("xdcc://"))
 	{
 		emit requestGame(data.mid(7));

@@ -28,7 +28,7 @@ ChannelHandler::ChannelHandler(Irc::Buffer* nBuffer, QWidget* parent)
 			horizontalLayout->addWidget(lstUsers);
 		}
 
-		
+
 		connect(m_Buffer, SIGNAL(joined(const QString)), this, SLOT(joined(const QString)));
 		connect(m_Buffer, SIGNAL(parted(const QString, const QString)), this, SLOT(parted(const QString, const QString)));
 		connect(m_Buffer, SIGNAL(quit(const QString, const QString)), this, SLOT(parted(const QString, const QString)));
@@ -93,7 +93,7 @@ void ChannelHandler::joined(const QString user)
 	if(list.isEmpty())
 	{
 		lstUsers->addItem(user);
-	}	
+	}
 }
 
 void ChannelHandler::parted(const QString user, const QString reason)
@@ -112,12 +112,15 @@ void ChannelHandler::parted(const QString user, const QString reason)
 
 void ChannelHandler::messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags)
 {
+	Q_UNUSED(flags);
 	QString txt = QString("<span class = \"msg\">&lt;%1&gt; %2</span>").arg(origin).arg(message);
 	txtChat->append(txt);
 }
 
 void ChannelHandler::noticeReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags)
 {
+	Q_UNUSED(flags);
+
 	QString txt = QString("<span class = \"notice\">-%1- %2</span>").arg(origin).arg(message);
 	txtChat->append(txt);
 }

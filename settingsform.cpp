@@ -12,7 +12,7 @@ SettingsForm::SettingsForm(QWidget *parent, Qt::WFlags flags)
 	settings = new QSettings("DotaCash", "DCClient X");
 
 	m_SoundOnGameStart = settings->value("GameStartedSound", true).toBool();
- 	ui.optionSoundGameStart->setCheckState(m_SoundOnGameStart ? Qt::Checked : Qt::Unchecked);
+	ui.optionSoundGameStart->setCheckState(m_SoundOnGameStart ? Qt::Checked : Qt::Unchecked);
 
 	m_FriendFollow = settings->value("FriendFollow", true).toBool();
 	ui.optionFriendFollow->setCheckState(m_FriendFollow ? Qt::Checked : Qt::Unchecked);

@@ -41,25 +41,25 @@ XDCC::XDCC(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 	ui.tblPubGames->horizontalHeader()->setResizeMode(1, QHeaderView::Fixed);
 	ui.tblPubGames->horizontalHeader()->hideSection(2);
 	ui.tblPubGames->horizontalHeader()->hideSection(3);
-	
+
 	ui.tblPrivGames->horizontalHeader()->setResizeMode(0, QHeaderView::Interactive);
 	ui.tblPrivGames->horizontalHeader()->setResizeMode(1, QHeaderView::Fixed);
 	ui.tblPrivGames->horizontalHeader()->hideSection(2);
 	ui.tblPrivGames->horizontalHeader()->hideSection(3);
-	
+
 	ui.tblHLGames->horizontalHeader()->setResizeMode(0, QHeaderView::Interactive);
 	ui.tblHLGames->horizontalHeader()->setResizeMode(1, QHeaderView::Fixed);
 	ui.tblHLGames->horizontalHeader()->hideSection(2);
 	ui.tblHLGames->horizontalHeader()->hideSection(3);
-	
+
 	ui.tblCustomGames->horizontalHeader()->setResizeMode(0, QHeaderView::Interactive);
 	ui.tblCustomGames->horizontalHeader()->setResizeMode(1, QHeaderView::Fixed);
 	ui.tblCustomGames->horizontalHeader()->hideSection(2);
 	ui.tblCustomGames->horizontalHeader()->hideSection(3);
 
- 	ui.tblPlayers->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
- 	ui.tblPlayers->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
- 	ui.tblPlayers->horizontalHeader()->setResizeMode(2, QHeaderView::ResizeToContents);
+	ui.tblPlayers->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+	ui.tblPlayers->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
+	ui.tblPlayers->horizontalHeader()->setResizeMode(2, QHeaderView::ResizeToContents);
 	ui.tblPlayers->horizontalHeader()->setResizeMode(3, QHeaderView::ResizeToContents);
 	ui.tblPlayers->horizontalHeader()->setResizeMode(4, QHeaderView::ResizeToContents);
 	ui.tblPlayers->horizontalHeader()->setResizeMode(5, QHeaderView::ResizeToContents);
@@ -87,8 +87,8 @@ XDCC::XDCC(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 
 	connect(m_CGProxy, SIGNAL(joinedGame(QString, QString)), ui.tabChannels, SLOT(joinedGame(QString, QString)));
 
- 	m_Skin = m_Settings->value("Skin", "default").toString();
- 
+	m_Skin = m_Settings->value("Skin", "default").toString();
+
 	QFile styleSheet(QString("./skins/%1/style.css").arg(m_Skin));
 	QString style;
 
@@ -123,7 +123,7 @@ bool XDCC::eventFilter(QObject *obj,  QEvent *event)
 			m_Active = true;
 			this->tick();
 			m_Timer->start(3000);
-			
+
 			inActivationEvent = false;
 		}
 
@@ -158,14 +158,16 @@ void XDCC::showSettings()
 
 void XDCC::gameDoubleClicked(int row, int column)
 {
+	Q_UNUSED(column);
+
 	QTableWidget* table;
 	switch(ui.tabGames->currentIndex())
 	{
-		case 0: table = ui.tblPubGames; break;
-		case 1: table = ui.tblPrivGames; break;
-		case 2: table = ui.tblHLGames; break;
-		case 3: table = ui.tblCustomGames; break;
-		default: return;
+	case 0: table = ui.tblPubGames; break;
+	case 1: table = ui.tblPrivGames; break;
+	case 2: table = ui.tblHLGames; break;
+	case 3: table = ui.tblCustomGames; break;
+	default: return;
 	}
 
 	if(row < table->rowCount())
@@ -185,14 +187,16 @@ void XDCC::gameDoubleClicked(int row, int column)
 
 void XDCC::gameClicked(int row, int column)
 {
+	Q_UNUSED(column);
+
 	QTableWidget* table;
 	switch(ui.tabGames->currentIndex())
 	{
-		case 0: table = ui.tblPubGames; break;
-		case 1: table = ui.tblPrivGames; break;
-		case 2: table = ui.tblHLGames; break;
-		case 3: table = ui.tblCustomGames; break;
-		default: return;
+	case 0: table = ui.tblPubGames; break;
+	case 1: table = ui.tblPrivGames; break;
+	case 2: table = ui.tblHLGames; break;
+	case 3: table = ui.tblCustomGames; break;
+	default: return;
 	}
 
 	if(row < table->rowCount())
@@ -211,10 +215,10 @@ void XDCC::newConnection()
 	m_ClientConnection = m_LocalServer->nextPendingConnection();
 
 	connect(m_ClientConnection, SIGNAL(disconnected()),
-		m_ClientConnection, SLOT(deleteLater()));
+			m_ClientConnection, SLOT(deleteLater()));
 
 	connect(m_ClientConnection, SIGNAL(readyRead()),
-		this, SLOT(readData()));
+			this, SLOT(readData()));
 }
 
 void XDCC::readData()
@@ -223,7 +227,7 @@ void XDCC::readData()
 
 	QString arg;
 	in >> arg;
-	
+
 	activateWindow();
 }
 
@@ -336,11 +340,11 @@ void XDCC::parseGamesXml(QString& data)
 		QTableWidget* table;
 		switch(m_CurrentType)
 		{
-			case 0: table = ui.tblPubGames; break;
-			case 1: table = ui.tblPrivGames; break;
-			case 2: table = ui.tblHLGames; break;
-			case 3: table = ui.tblCustomGames; break;
-			default: return;
+		case 0: table = ui.tblPubGames; break;
+		case 1: table = ui.tblPrivGames; break;
+		case 2: table = ui.tblHLGames; break;
+		case 3: table = ui.tblCustomGames; break;
+		default: return;
 		}
 
 		table->setRowCount(m_GameInfos.size());
@@ -483,7 +487,7 @@ void XDCC::parsePlayersXml(QString& data)
 	else
 	{
 		ui.tblPlayers->setRowCount(m_PlayerInfos.size());
-	
+
 		for(int i = 0; i < m_PlayerInfos.size(); ++i)
 		{
 			PlayerInfo* playerInfo = m_PlayerInfos.at(i);
@@ -510,21 +514,21 @@ void XDCC::parsePlayersXml(QString& data)
 
 			itemWins->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 			itemWins->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-			
+
 			QColor color;
 			if(i < 5)		// sentinel
 			{
 				if(i % 2)
 					color = QColor(0xFF, 0xEE, 0xEE);
 				else
-					color = QColor(0xFF, 0xF5, 0xF5);				
+					color = QColor(0xFF, 0xF5, 0xF5);
 			}
 			else if(i < 10)	// scourge
 			{
 				if(i % 2)
 					color = QColor(0xEE, 0xFF, 0xEE);
 				else
-					color = QColor(0xF5, 0xFF, 0xF5);		
+					color = QColor(0xF5, 0xFF, 0xF5);
 			}
 			else			// other cells
 				color = QColor(0xFF, 0xFF, 0xFF);

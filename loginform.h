@@ -21,7 +21,7 @@ public:
 public slots:
 	void login();
 	void parseLogin(QString& data);
-	
+
 private:
 	Ui::LoginDialog ui;
 

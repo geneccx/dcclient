@@ -3,15 +3,15 @@
 ApiFetcher::ApiFetcher(QWidget* parent) : QObject(parent), currentReply(0)
 {
 	connect(&manager, SIGNAL(finished(QNetworkReply*)),
-		this, SLOT(finished(QNetworkReply*)));
+			this, SLOT(finished(QNetworkReply*)));
 
 	connect(&manager, SIGNAL(finished(QNetworkReply*)),
-		this, SLOT(deleteLater()));
+			this, SLOT(deleteLater()));
 }
 
 ApiFetcher::~ApiFetcher()
 {
-	
+
 }
 
 void ApiFetcher::fetch(QString url)

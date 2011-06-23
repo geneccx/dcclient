@@ -60,7 +60,7 @@ QByteArray CGameProtocol::DecodeStatString( QByteArray &data )
 	quint8 Mask;
 	QByteArray Result;
 
-	for( quint32 i = 0; i < data.size( ); i++ )
+	for( int i = 0; i < data.size( ); i++ )
 	{
 		if( ( i % 8 ) == 0 )
 			Mask = data[i];
@@ -180,8 +180,8 @@ QByteArray CGameProtocol :: SEND_W3GS_CHAT_FROM_HOST( quint8 fromPID, QByteArray
 quint32 CGameInfo::NextUniqueGameID = 1;
 
 CGameInfo::CGameInfo(quint32 nProductID, quint32 nVersion, quint32 nHostCounter, quint32 nEntryKey,
-	QString nGameName, QString nGamePassword, QByteArray nStatString, quint32 nSlotsTotal,
-	quint32 nMapGameType, quint32 nUnknown2, quint32 nSlotsOpen, quint32 nUpTime, quint16 nPort, bool nReliable) :
+					 QString nGameName, QString nGamePassword, QByteArray nStatString, quint32 nSlotsTotal,
+					 quint32 nMapGameType, quint32 nUnknown2, quint32 nSlotsOpen, quint32 nUpTime, quint16 nPort, bool nReliable) :
 	ProductID(nProductID), Version(nVersion), HostCounter(nHostCounter), EntryKey(nEntryKey),
 	GameName(nGameName), GamePassword(nGamePassword), StatString(nStatString), SlotsTotal(nSlotsTotal),
 	MapGameType(nMapGameType), Unknown2(nUnknown2), SlotsOpen(nSlotsOpen), UpTime(nUpTime), Port(nPort), Reliable(nReliable)

@@ -34,8 +34,8 @@ public:
 	~XDCC();
 
 	void SetUsername(QString nUsername)		{ m_Username = nUsername; ui.lbl_Account->setText(m_Username); }
-	void SetScore(quint32 nScore)			{ m_Score = nScore; ui.lbl_Rating->setText(QString::number(m_Score)); }
-	void SetRank(quint32 nRank)				{ m_Rank = nRank; ui.lbl_Rank->setText(QString::number(m_Rank)); }
+	void SetScore(quint32 nScore)		{ m_Score = nScore; ui.lbl_Rating->setText(QString::number(m_Score)); }
+	void SetRank(quint32 nRank)			{ m_Rank = nRank; ui.lbl_Rank->setText(QString::number(m_Rank)); }
 	void SetSessionID(QString nSessionID)	{ m_SessionID = nSessionID; }
 
 	QString GetUsername()	{ return m_Username; }
