@@ -1,11 +1,11 @@
 TEMPLATE = app
 TARGET = xdcc
 DESTDIR = ../
-QT += core gui network xml webkit
+QT += core gui network webkit
 
 CONFIG += release
 
-DEFINES += QT_LARGEFILE_SUPPORT QT_XML_LIB QT_NETWORK_LIB QT_WEBKIT_LIB
+DEFINES += QT_LARGEFILE_SUPPORT QT_NETWORK_LIB QT_WEBKIT_LIB
 
 INCLUDEPATH += ./GeneratedFiles \
     ./GeneratedFiles/Release \

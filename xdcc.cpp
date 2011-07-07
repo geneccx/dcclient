@@ -78,7 +78,9 @@ XDCC::XDCC(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 	connect(ui.action_About, SIGNAL(triggered()), this, SLOT(showAbout()));
 	connect(ui.action_Options, SIGNAL(triggered()), this, SLOT(showSettings()));
 
+#ifdef WIN32
 	win_sparkle_init();
+#endif
 
 	m_LoginForm = new LoginForm(this);
 	m_LoginForm->show();
@@ -107,7 +109,9 @@ XDCC::XDCC(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 
 XDCC::~XDCC()
 {
+#ifdef WIN32
 	win_sparkle_cleanup();
+#endif
 }
 
 bool XDCC::eventFilter(QObject *obj,  QEvent *event)
@@ -143,7 +147,11 @@ bool XDCC::eventFilter(QObject *obj,  QEvent *event)
 
 void XDCC::checkForUpdates()
 {
+#ifdef WIN32
 	win_sparkle_check_update_with_ui();
+#else
+	QMessageBox::information(this, "DotaCash Client X", tr("This feature is currently disabled."));
+#endif
 }
 
 void XDCC::showAbout()
