@@ -64,7 +64,7 @@ CGProxy::CGProxy(QWidget* parent) : QObject(parent), m_LocalSocket(0)
 	connect(m_LocalServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 
 	m_RequesterSocket = new QUdpSocket(this);
-	m_RequesterSocket->bind(6969, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
+	m_RequesterSocket->bind(m_ListenPort, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
 
 	connect(m_RequesterSocket, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
 
@@ -72,7 +72,7 @@ CGProxy::CGProxy(QWidget* parent) : QObject(parent), m_LocalSocket(0)
 
 	timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-	timer->start(40);
+	timer->start(30);
 
 	m_TotalPacketsReceivedFromLocal = 0;
 	m_TotalPacketsReceivedFromRemote = 0;
@@ -149,6 +149,9 @@ void CGProxy::update()
 			{
 				SendLocalChat( "GProxy++ ran out of time to reconnect, Warcraft III will disconnect soon." );
 				qDebug() << ( "[GPROXY] ran out of time to reconnect" );
+
+				m_LocalSocket->disconnectFromHost( );
+				m_RemoteServerIP.clear( );
 			}
 
 			m_LastActionTime = GetTime( );
@@ -254,7 +257,7 @@ void CGProxy::update()
 
 	if(!m_LocalSocket || m_LocalSocket->state() != QTcpSocket::ConnectedState || m_RemoteSocket->state() != QTcpSocket::ConnectedState)
 	{
-		if( GetTime( ) - m_LastBroadcastTime > 3 )
+		if( GetTime( ) - m_LastBroadcastTime >= 3 )
 		{
 			for(QVector<CGameInfo*>::const_iterator i = games.constBegin(); i != games.constEnd(); ++i)
 				m_RequesterSocket->writeDatagram((*i)->GetPacket(m_ListenPort), QHostAddress::LocalHost, 6112);
