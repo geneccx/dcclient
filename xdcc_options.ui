@@ -92,7 +92,7 @@
        <item row="4" column="0">
         <widget class="QCheckBox" name="optionRefresh">
          <property name="text">
-          <string>Refresh gamelist when window is inactive</string>
+          <string>Refresh gamelist in background</string>
          </property>
         </widget>
        </item>

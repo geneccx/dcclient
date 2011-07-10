@@ -27,3 +27,5 @@ win32: {
     RC_FILE = xdcc.rc
     LIBS += -lwinmm -lWinSparkle
 }
+
+QMAKE_CXXFLAGS += /J

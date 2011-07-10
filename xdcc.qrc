@@ -2,6 +2,7 @@
     <qresource prefix="/xDCC">
         <file>software-update-available.ico</file>
         <file>software-update-available.png</file>
+        <file>xdcc.ico</file>
     </qresource>
     <qresource prefix="/lang"/>
 </RCC>
