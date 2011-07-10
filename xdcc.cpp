@@ -116,29 +116,34 @@ XDCC::~XDCC()
 
 bool XDCC::eventFilter(QObject *obj,  QEvent *event)
 {
+	bool inactiveRefresh = m_Settings->value("InactiveRefresh", false).toBool();
+
 	static bool inActivationEvent = false;
 
-	if (obj == qApp && !inActivationEvent)
+	if(!inactiveRefresh)
 	{
-		if (event->type() == QEvent::ApplicationActivate && !m_Active)
+		if (obj == qApp && !inActivationEvent)
 		{
-			inActivationEvent = true;
+			if (event->type() == QEvent::ApplicationActivate && !m_Active)
+			{
+				inActivationEvent = true;
 
-			m_Active = true;
-			this->tick();
-			m_Timer->start(3000);
+				m_Active = true;
+				this->tick();
+				m_Timer->start(3000);
 
-			inActivationEvent = false;
-		}
+				inActivationEvent = false;
+			}
 
-		else if (event->type() == QEvent::ApplicationDeactivate && m_Active)
-		{
-			inActivationEvent = true;
+			else if (event->type() == QEvent::ApplicationDeactivate && m_Active)
+			{
+				inActivationEvent = true;
 
-			m_Active = false;
-			m_Timer->stop();
+				m_Active = false;
+				m_Timer->stop();
 
-			inActivationEvent = false;
+				inActivationEvent = false;
+			}
 		}
 	}
 

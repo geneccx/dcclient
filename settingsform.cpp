@@ -17,6 +17,9 @@ SettingsForm::SettingsForm(QWidget *parent, Qt::WFlags flags)
 	m_FriendFollow = settings->value("FriendFollow", true).toBool();
 	ui.optionFriendFollow->setCheckState(m_FriendFollow ? Qt::Checked : Qt::Unchecked);
 
+	m_Refresh = settings->value("InactiveRefresh", false).toBool();
+	ui.optionFriendFollow->setCheckState(m_Refresh ? Qt::Checked : Qt::Unchecked);
+
 	m_Skin = settings->value("Skin", "default").toString();
 
 	QDir skinsDir("./skins/");
@@ -41,6 +44,9 @@ void SettingsForm::saveSettings()
 
 	m_FriendFollow = ui.optionFriendFollow->isChecked();
 	settings->setValue("FriendFollow", m_FriendFollow);
+
+	m_Refresh = ui.optionRefresh->isChecked();
+	settings->setValue("InactiveRefresh", m_Refresh);
 
 	m_Skin = ui.cmbSkin->currentText();
 	settings->setValue("Skin", m_Skin);

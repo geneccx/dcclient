@@ -27,6 +27,8 @@ private:
 
 	bool m_SoundOnGameStart;
 	bool m_FriendFollow;
+	bool m_Refresh;
+
 	QString m_Skin;
 };
 

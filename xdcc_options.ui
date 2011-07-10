@@ -58,7 +58,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QCheckBox" name="optionFriendFollow">
          <property name="text">
           <string>Automatically add games friends join to the list</string>
@@ -88,6 +88,13 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="optionRefresh">
+         <property name="text">
+          <string>Refresh gamelist when window is inactive</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
