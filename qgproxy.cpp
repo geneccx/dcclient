@@ -916,7 +916,6 @@ void CGProxy::processServerPackets()
 					ds >> m_ReconnectKey;
 					ds >> m_NumEmptyActions;
 					SendLocalChat( tr("GProxy++ disconnect protection is ready (%1 second buffer).").arg( ( m_NumEmptyActions + 1 ) * 60 ) );
-					qDebug() << tr("[GPROXY] GProxy++ disconnect protection is ready (%1 second buffer).").arg( ( m_NumEmptyActions + 1 ) * 60 );
 				}
 				else if( Packet->GetID( ) == CGPSProtocol :: GPS_RECONNECT && Data.size( ) == 8 )
 				{
