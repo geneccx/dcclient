@@ -17,7 +17,7 @@
 */
 
 #ifndef XDCC_VERSION
-#define XDCC_VERSION "1.7.1\0"
+#define XDCC_VERSION "1.7.2\0"
 
-const QString API_SERVER = "dual.dotacash.com";
+const QString API_SERVER = "emma.dotacash.com";
 #endif
