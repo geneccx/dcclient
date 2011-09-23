@@ -24,16 +24,19 @@
 #include <QStringList>
 #include <QUrl>
 
-#define IRC_STATIC
-#include <ircclient-qt/Irc>
-#include <ircclient-qt/IrcBuffer>
-#include <ircclient-qt/IrcSession>
+#define COMMUNI_STATIC
+#include <Irc>
+#include <IrcMessage>
+#include <IrcSession>
+#include <IrcCommand>
+#include <ircprefix.h>
 
 class ChannelHandler;
 class FriendsHandler;
 
 enum MessageType
 {
+	Raw,
 	Normal,
 	Sys,
 	Err,
@@ -47,16 +50,13 @@ public:
 	IrcHandler(QWidget* parent);
 
 	void connectToIrc(QString name);
-	void part(QString channel) { if(irc) irc->part(channel); }
+	void part(QString channel) { if(irc) irc->sendCommand(IrcCommand::createPart(channel)); }
 
 public slots:
-	void irc_connected();
-	void irc_disconnected();
-	void irc_buffer_added(Irc::Buffer *buffer);
-	void irc_buffer_removed(Irc::Buffer *buffer);
+	void connected();
+	void disconnected();
 
-	void numericMessageReceived(const QString& origin, uint code, const QStringList& params);
-	void messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags);
+	void messageReceived(IrcMessage *message);
 	void handleChat(QString&, QString&);
 	void myCloseTab(int);
 
@@ -71,8 +71,7 @@ signals:
 	void requestGame(QString);
 
 private:
-	Irc::Session *irc;
-	Irc::Buffer *m_Buffer;
+	IrcSession *irc;
 
 	QMap<QString, ChannelHandler*> m_ChannelMap;
 	QMap<QString, FriendsHandler*> m_FriendsMap;
@@ -81,6 +80,12 @@ private:
 	QStringList m_Friends;
 
 	void removeTabName(QString name);
+	void joinedChannel(IrcPrefix origin, IrcJoinMessage* joinMsg);
+	void partedChannel(IrcPrefix origin, IrcPartMessage* partMsg);
+	void privateMessage(IrcPrefix origin, IrcPrivateMessage* privMsg);
+	void noticeMessage(IrcPrefix origin, IrcNoticeMessage* noticeMsg);
+	void nickMessage(IrcPrefix origin, IrcNickMessage* nickMsg);
+	void numericMessage(IrcNumericMessage* numMsg);
 };
 
 #endif

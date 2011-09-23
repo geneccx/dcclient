@@ -18,8 +18,8 @@
 
 #include "friendshandler.h"
 
-FriendsHandler::FriendsHandler(Irc::Buffer* nBuffer, QString nFriendName, QWidget *parent) :
-	m_Buffer(nBuffer), m_FriendName(nFriendName), QObject(parent)
+FriendsHandler::FriendsHandler(QString nFriendName, QWidget *parent) :
+	m_FriendName(nFriendName), QObject(parent)
 {
 	m_Status = false;
 
@@ -29,7 +29,7 @@ FriendsHandler::FriendsHandler(Irc::Buffer* nBuffer, QString nFriendName, QWidge
 		connect(this, SIGNAL(requestGame(QString)), parent, SIGNAL(requestGame(QString)));
 	}
 
-	if(m_Buffer)
+/*	if(m_Buffer)
 	{
 		connect(m_Buffer, SIGNAL(joined(const QString)), this, SLOT(joined(const QString)));
 		connect(m_Buffer, SIGNAL(parted(const QString, const QString)), this, SLOT(parted(const QString, const QString)));
@@ -39,6 +39,7 @@ FriendsHandler::FriendsHandler(Irc::Buffer* nBuffer, QString nFriendName, QWidge
 		connect(m_Buffer, SIGNAL(messageReceived(const QString, const QString, Irc::Buffer::MessageFlags)), this, SLOT(messageReceived(const QString, const QString, Irc::Buffer::MessageFlags)));
 		connect(m_Buffer, SIGNAL(noticeReceived(const QString, const QString, Irc::Buffer::MessageFlags)), this, SLOT(noticeReceived(const QString, const QString, Irc::Buffer::MessageFlags)));
 	}
+*/
 }
 
 void FriendsHandler::nickChanged(const QString user, const QString nick)
@@ -67,20 +68,16 @@ void FriendsHandler::parted(const QString user, const QString reason)
 	}
 }
 
-void FriendsHandler::messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags)
+void FriendsHandler::messageReceived(const QString &origin, const QString &message)
 {
-	Q_UNUSED(flags);
-
 	if(origin.toLower() == m_FriendName.toLower())
 	{
 		emit showMessage(QString("&lt;%1&gt; %2").arg(origin).arg(message), Friends);
 	}
 }
 
-void FriendsHandler::noticeReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags)
+void FriendsHandler::noticeReceived(const QString &origin, const QString &message)
 {
-	Q_UNUSED(flags);
-
 	if(origin.toLower() == m_FriendName.toLower())
 	{
 		if(message.startsWith("xdcc://"))

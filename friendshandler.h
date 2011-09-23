@@ -24,18 +24,16 @@
 #include <QTextBrowser>
 #include <QListWidget>
 
-#define IRC_STATIC
-#include <ircclient-qt/Irc>
-#include <ircclient-qt/IrcBuffer>
+#define COMMUNI_STATIC
+#include <Irc>
+#include <IrcMessage>
 
 class FriendsHandler : public QObject
 {
 	Q_OBJECT
 
 public:
-	FriendsHandler(Irc::Buffer* nBuffer, QString nFriendName, QWidget *parent=0);
-
-	Irc::Buffer* GetBuffer() { return m_Buffer; }
+	FriendsHandler(QString nFriendName, QWidget *parent=0);
 
 	bool GetStatus() { return m_Status; }
 
@@ -46,15 +44,14 @@ public slots:
 	void parted(const QString, const QString);
 
 	void nickChanged(const QString, const QString);
-	void messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags=Irc::Buffer::NoFlags);
-	void noticeReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags=Irc::Buffer::NoFlags);
+	void messageReceived(const QString &origin, const QString &message);
+	void noticeReceived(const QString &origin, const QString &message);
 
 signals:
 	void showMessage(QString, MessageType msgType = Normal);
 	void requestGame(QString);
 
 private:
-	Irc::Buffer* m_Buffer;
 	QString m_FriendName;
 
 	bool m_Status;

@@ -18,10 +18,15 @@
 
 #include <QObject>
 #include <QFile>
+
+#define COMMUNI_STATIC
+#include <ircutil.h>
+
 #include "channelhandler.h"
 
-ChannelHandler::ChannelHandler(Irc::Buffer* nBuffer, QWidget* parent) 
-	: QObject(parent), m_Buffer(nBuffer), lstUsers(0)
+
+ChannelHandler::ChannelHandler(bool showUserlist, QWidget* parent) 
+	: QObject(parent), lstUsers(0)
 {
 	m_Tab = new QWidget(parent);
 
@@ -33,27 +38,15 @@ ChannelHandler::ChannelHandler(Irc::Buffer* nBuffer, QWidget* parent)
 
 	horizontalLayout->addWidget(txtChat);
 
-	if(m_Buffer)
+	if(showUserlist)
 	{
-		if(m_Buffer->receiver().startsWith("#"))
-		{
-			lstUsers = new QListWidget(m_Tab);
-			lstUsers->setSortingEnabled(true);
-			lstUsers->setMaximumWidth(180);
-			lstUsers->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-			lstUsers->setAlternatingRowColors(true);
+		lstUsers = new QListWidget(m_Tab);
+		lstUsers->setSortingEnabled(true);
+		lstUsers->setMaximumWidth(180);
+		lstUsers->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		lstUsers->setAlternatingRowColors(true);
 
-			horizontalLayout->addWidget(lstUsers);
-		}
-
-
-		connect(m_Buffer, SIGNAL(joined(const QString)), this, SLOT(joined(const QString)));
-		connect(m_Buffer, SIGNAL(parted(const QString, const QString)), this, SLOT(parted(const QString, const QString)));
-		connect(m_Buffer, SIGNAL(quit(const QString, const QString)), this, SLOT(parted(const QString, const QString)));
-
-		connect(m_Buffer, SIGNAL(nickChanged(const QString, const QString)), this, SLOT(nickChanged(const QString, const QString)));
-		connect(m_Buffer, SIGNAL(messageReceived(const QString, const QString, Irc::Buffer::MessageFlags)), this, SLOT(messageReceived(const QString, const QString, Irc::Buffer::MessageFlags)));
-		connect(m_Buffer, SIGNAL(noticeReceived(const QString, const QString, Irc::Buffer::MessageFlags)), this, SLOT(noticeReceived(const QString, const QString, Irc::Buffer::MessageFlags)));
+		horizontalLayout->addWidget(lstUsers);
 	}
 
 	connect(txtChat, SIGNAL(anchorClicked(QUrl)), parent, SLOT(handleUrl(QUrl)));
@@ -78,13 +71,12 @@ void ChannelHandler::reloadSkin()
 	}
 }
 
-void ChannelHandler::UpdateNames()
+void ChannelHandler::UpdateNames(QStringList& names)
 {
 	if(!lstUsers)
 		return;
 
-	lstUsers->clear();
-	lstUsers->addItems(m_Buffer->names());
+	lstUsers->addItems(names);
 }
 
 void ChannelHandler::nickChanged(const QString user, const QString nick)
@@ -128,17 +120,14 @@ void ChannelHandler::parted(const QString user, const QString reason)
 	}
 }
 
-void ChannelHandler::messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags)
+void ChannelHandler::messageReceived(const QString &origin, const QString &message)
 {
-	Q_UNUSED(flags);
-	QString txt = QString("<span class = \"msg\">&lt;%1&gt; %2</span>").arg(origin).arg(message);
+	QString txt = QString("<span class = \"msg\">&lt;%1&gt; %2</span>").arg(origin).arg(IrcUtil::messageToHtml(message));
 	txtChat->append(txt);
 }
 
-void ChannelHandler::noticeReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags)
+void ChannelHandler::noticeReceived(const QString &origin, const QString &message)
 {
-	Q_UNUSED(flags);
-
-	QString txt = QString("<span class = \"notice\">-%1- %2</span>").arg(origin).arg(message);
+	QString txt = QString("<span class = \"notice\">-%1- %2</span>").arg(origin).arg(IrcUtil::messageToHtml(message));
 	txtChat->append(txt);
 }

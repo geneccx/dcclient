@@ -24,35 +24,32 @@
 #include <QTextBrowser>
 #include <QListWidget>
 
-#define IRC_STATIC
-#include <ircclient-qt/Irc>
-#include <ircclient-qt/IrcBuffer>
+#define COMMUNI_STATIC
+#include <Irc>
+#include <IrcMessage>
+#include <ircutil.h>
 
 class ChannelHandler : public QObject
 {
 	Q_OBJECT
 
 public:
-	ChannelHandler(Irc::Buffer* nBuffer, QWidget *parent=0);
+	ChannelHandler(bool showUserlist=true, QWidget *parent=0);
 
 	QWidget* GetTab() { return m_Tab; }
-	Irc::Buffer* GetBuffer() { return m_Buffer; }
 
 	void showText(QString msg) { txtChat->append(msg); }
-	void message(QString msg) { if(m_Buffer) m_Buffer->message(msg); }
-	void UpdateNames();
+	void UpdateNames(QStringList& names);
 	void reloadSkin();
 
-public slots:
 	void joined(const QString);
 	void parted(const QString, const QString);
 
 	void nickChanged(const QString, const QString);
-	void messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags=Irc::Buffer::NoFlags);
-	void noticeReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags=Irc::Buffer::NoFlags);
+	void messageReceived(const QString &origin, const QString &message);
+	void noticeReceived(const QString &origin, const QString &message);
 
 private:
-	Irc::Buffer* m_Buffer;
 	QWidget* m_Tab;
 
 	QTextBrowser* txtChat;

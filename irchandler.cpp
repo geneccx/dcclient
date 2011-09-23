@@ -1,8 +1,30 @@
+/*
+
+   Copyright 2011 Gene Chen
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+*/
+
 #include "ui_xdcc_main.h"
 #include "channelhandler.h"
 #include "friendshandler.h"
 
-IrcHandler::IrcHandler(QWidget* parent) : QTabWidget(parent), irc(0), m_Buffer(0)
+#include <qstringlist.h>
+#include <IrcUtil>
+
+IrcHandler::IrcHandler(QWidget* parent)
+	: QTabWidget(parent), irc(0)
 {
 	connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(myCloseTab(int)));
 
@@ -16,25 +38,18 @@ void IrcHandler::connectToIrc(QString name)
 {
 	m_Username = name;
 
-	irc = new Irc::Session(this);
+	irc = new IrcSession(this);
 
-	connect(irc, SIGNAL(connected()), this, SLOT(irc_connected()));
-	connect(irc, SIGNAL(disconnected()), this, SLOT(irc_disconnected()));
-	connect(irc, SIGNAL(bufferAdded (Irc::Buffer*)), this, SLOT(irc_buffer_added(Irc::Buffer*)));
-	connect(irc, SIGNAL(bufferRemoved (Irc::Buffer*)), this, SLOT(irc_buffer_removed(Irc::Buffer*)));
+	connect(irc, SIGNAL(connected()), this, SLOT(connected()));
+	connect(irc, SIGNAL(disconnected()), this, SLOT(disconnected()));
+	connect(irc, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(messageReceived(IrcMessage*)));
 
-	irc->setNick(m_Username);
-	irc->setIdent("dcclient");
+	irc->setHost("irc.dotacash.com");
+    irc->setPort(6667);
+	irc->setNickName(m_Username);
+	irc->setUserName("dcclient");
 	irc->setRealName(m_Username);
-	irc->addAutoJoinChannel("#dcchat");
-	irc->addAutoJoinChannel("#dotacash");
-	irc->addAutoJoinChannel(QString("##%1").arg(m_Username));
-
-	for(int i = 0; i < m_Friends.size(); ++i)
-		irc->addAutoJoinChannel(QString("##%1").arg(m_Friends.at(i).toLower()));
-
-	irc->setAutoReconnectDelay(60);
-	irc->connectToServer("irc.dotacash.com", 6667);
+	irc->open();
 }
 
 void IrcHandler::myCloseTab(int idx)
@@ -46,29 +61,28 @@ void IrcHandler::myCloseTab(int idx)
 	else
 	{
 		if(channel.at(0) == '#')
-			irc->part(channel);
+			irc->sendCommand(IrcCommand::createPart(channel));
 		else
 			removeTabName(channel);
 	}
 }
 
-void IrcHandler::irc_connected()
+void IrcHandler::connected()
 {
 	emit showMessage(tr("Connected to %1").arg("irc.dotacash.com"), 3000);
+
+	irc->sendCommand(IrcCommand::createJoin("#dcchat"));
+	irc->sendCommand(IrcCommand::createJoin("#dotacash"));
+	irc->sendCommand(IrcCommand::createJoin(QString("##%1").arg(m_Username)));
+	
+	for(int i = 0; i < m_Friends.size(); ++i)
+		irc->sendCommand(IrcCommand::createJoin(QString("##%1").arg(m_Friends.at(i).toLower())));
 }
 
-void IrcHandler::irc_disconnected()
+void IrcHandler::disconnected()
 {
-	for(int i = 0; i < irc->buffers().size(); ++i)
-	{
-		irc_buffer_removed(irc->buffers().at(i));
-		irc->buffers().at(i);
-	}
-
 	for(int i = 0; i < m_ChannelMap.size(); ++i)
-	{
 		delete m_ChannelMap.values().at(i);
-	}
 
 	m_ChannelMap.clear();
 
@@ -100,7 +114,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 			if(JoinChan.startsWith("##"))
 				return;
 
-			irc->join(JoinChan);
+			irc->sendCommand(IrcCommand::createJoin(JoinChan));
 		}
 
 		else if(Command == "/part" || Command == "/p")
@@ -110,20 +124,21 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 				if(origin.startsWith("##") || origin == "#dcchat" || origin == "#dotacash")
 					return;
 
-				irc->part(origin);
+				irc->sendCommand(IrcCommand::createPart(origin));
 			}
 			else
 			{
 				if(Payload.at(0).startsWith("##") || Payload.at(0) == "#dcchat" || Payload.at(0) == "#dotacash")
 					return;
 
-				irc->part(Payload.at(0));
+				irc->sendCommand(IrcCommand::createPart(Payload.at(0)));
 			}
 		}
 
 		else if(Command == "/nick" && !Payload.empty())
 		{
-			irc->setNick(Payload.at(0));
+			irc->sendCommand(IrcCommand::createNick(Payload.at(0)));
+			irc->setNickName(Payload.at(0));
 		}
 
 		else if((Command == "/whisper" || Command == "/w") && Payload.size() >= 2)
@@ -131,7 +146,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 			QString to = Payload.at(0);
 			Payload.pop_front();
 
-			irc->message(to, Payload.join(" "));
+			irc->sendCommand(IrcCommand::createMessage(to, Payload.join(" ")));
 		}
 
 		else if((Command == "/f" || Command == "/friends") && !Payload.isEmpty())
@@ -177,7 +192,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 					else
 					{
 						m_Friends << friendName;
-						irc->join(QString("##%1").arg(friendName));
+						irc->sendCommand(IrcCommand::createJoin(QString("##%1").arg(friendName)));
 
 						QSettings("DotaCash", "DCClient X", this).setValue("Friends", m_Friends.join(";"));
 						showTextCurrentTab(tr("Added %1 to your friends list.").arg(friendName), Sys);
@@ -200,7 +215,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 						int idx = m_Friends.indexOf(friendName);
 						m_Friends.removeAt(idx);
 
-						irc->part(QString("##%1").arg(friendName));
+						irc->sendCommand(IrcCommand::createPart(QString("##%1").arg(friendName)));
 
 						delete m_FriendsMap[friendName.toLower()];
 						m_FriendsMap.remove(friendName.toLower());
@@ -217,14 +232,11 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 					showTextCurrentTab(tr("What do you want to say?"), Err);
 				else
 				{
-					if(m_Buffer)
-					{
-						Payload.pop_front();
-						QString msg = Payload.join(" ");
+					Payload.pop_front();
+					QString msg = Payload.join(" ");
 
-						m_Buffer->message(msg);
-						showTextCurrentTab(tr("You whisper to your friends: %1").arg(msg), Sys);
-					}
+					irc->sendCommand(IrcCommand::createMessage(QString("##%1").arg(m_Username.toLower()), msg));
+					showTextCurrentTab(tr("You whisper to your friends: %1").arg(msg), Sys);
 				}
 			}
 		}
@@ -234,77 +246,270 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 			showTextCurrentTab(tr("Invalid command."), Err);
 		}
 	}
-
 	else
 	{
-		if(channel)
-			channel->message(Message);
+		irc->sendCommand(IrcCommand::createMessage(origin.toLower(), Message));
+		showTextCurrentTab(QString("<%1> %2").arg(irc->nickName()).arg(Message));
 	}
 }
 
-void IrcHandler::irc_buffer_added(Irc::Buffer *buffer)
+void IrcHandler::joinedChannel(IrcPrefix origin, IrcJoinMessage* joinMsg)
 {
-	QString name = buffer->receiver();
+	if(!origin.isValid())
+		return;
 
-	if(name == "irc.dotacash.com")
-	{
-		connect(buffer, SIGNAL(numericMessageReceived(const QString&, uint, const QStringList&)), this, SLOT(numericMessageReceived(const QString&, uint, const QStringList&)));
-		emit showMessage(tr("Connected to %1").arg("irc.dotacash.com"), 3000);
-	}
+	QString& user = origin.name();
+	QString& channel = joinMsg->channel();
+	QString nameLower = channel.toLower();
 
-	else if(name.toLower() == m_Username.toLower())
+	if(user.toLower() == irc->nickName().toLower())
 	{
-		connect(buffer, SIGNAL(messageReceived(const QString, const QString, Irc::Buffer::MessageFlags)), this, SLOT(messageReceived(const QString, const QString, Irc::Buffer::MessageFlags)));
-	}
-
-	else if(name.startsWith("##"))
-	{
-		if(name.toLower() != ("##" + m_Username.toLower()))
-			m_FriendsMap[name.mid(2).toLower()] = new FriendsHandler(buffer, name.mid(2), this);
+		if(channel.startsWith("##"))
+		{
+			if(nameLower != ("##" + m_Username.toLower()))
+			{
+				FriendsHandler* handler = m_FriendsMap[nameLower.mid(2)];
+			
+				if(!handler)
+				{
+					handler = new FriendsHandler(channel.mid(2), this);
+					m_FriendsMap[nameLower.mid(2)] = handler;
+				}
+			}
+		}
 		else
-			m_Buffer = buffer;
-	}
+		{
+			ChannelHandler* handler = m_ChannelMap[nameLower];
 
+			if(!handler)
+			{
+				handler = new ChannelHandler(channel.startsWith('#'), this);
+				m_ChannelMap[nameLower] = handler;
+
+				this->addTab(handler->GetTab(), channel);
+
+				int idx = this->count() - 1;
+
+				if(nameLower == "#dotacash" || nameLower == "#dcchat")
+					this->tabBar()->setTabButton(idx, QTabBar::RightSide, 0);
+
+				this->setCurrentIndex(idx);
+			}
+		}
+	}
 	else
 	{
-		ChannelHandler* handler = new ChannelHandler(buffer, this);
+		if(channel.startsWith("##"))
+		{
+			if(nameLower != ("##" + m_Username.toLower()))
+			{
+				FriendsHandler* handler = m_FriendsMap[nameLower.mid(2)];
+			
+				if(handler)
+					handler->joined(user);
+			}
+		}
+		else
+		{
+			ChannelHandler* handler = m_ChannelMap[nameLower];
 
-		m_ChannelMap[name.toLower()] = handler;
+			if(handler)
+				handler->joined(user);
+		}
 
-		this->addTab(handler->GetTab(), name);
-
-		int idx = this->count() - 1;
-
-		if(name.toLower() == "#dotacash" || name.toLower() == "#dcchat")
-			this->tabBar()->setTabButton(idx, QTabBar::RightSide, 0);
-
-		this->setCurrentIndex(idx);
 	}
 }
 
-void IrcHandler::irc_buffer_removed(Irc::Buffer *buffer)
+void IrcHandler::partedChannel(IrcPrefix origin, IrcPartMessage* partMsg)
 {
-	removeTabName(buffer->receiver());
-}
+	if(!origin.isValid())
+		return;
 
-void IrcHandler::messageReceived(const QString &origin, const QString &message, Irc::Buffer::MessageFlags flags)
-{
-	Q_UNUSED(flags);
+	QString& user = origin.name();
+	QString& channel = partMsg->channel();
 
-	ChannelHandler* handler = m_ChannelMap[origin.toLower()];
-
-	if(!handler)
+	if(user.toLower() == irc->userName().toLower())
+		removeTabName(channel.toLower());
+	else
 	{
-		handler = new ChannelHandler(NULL, this);
+		if(channel.startsWith("##"))
+		{
+			if(channel.toLower() != ("##" + m_Username.toLower()))
+			{
+				FriendsHandler* handler = m_FriendsMap[channel.toLower().mid(2)];
+			
+				if(handler)
+					handler->parted(user, partMsg->reason());
+			}
+		}
+		else
+		{
+			ChannelHandler* handler = m_ChannelMap[channel.toLower()];
 
-		m_ChannelMap[origin.toLower()] = handler;
+			if(handler)
+				handler->parted(user, partMsg->reason());
+		}
+	}
+}
 
-		this->addTab(handler->GetTab(), origin);
-		this->setCurrentIndex(this->count() - 1);
+void IrcHandler::privateMessage(IrcPrefix origin, IrcPrivateMessage* privMsg)
+{
+	if(!origin.isValid())
+		return;
+
+	QString& user = origin.name();
+	QString& target = privMsg->target();
+	QString& message = privMsg->message();
+
+	QString txt = QString("<%1> %2").arg(user).arg(message);
+
+	if(target.startsWith("##"))
+	{
+		if(target.toLower() != ("##" + m_Username.toLower()))
+		{
+			FriendsHandler* handler = m_FriendsMap[target.toLower().mid(2)];
+			
+			if(handler)
+				handler->messageReceived(user, message);
+		}
+	}
+	else if(target.toLower() != irc->nickName().toLower())
+	{
+		ChannelHandler* handler = m_ChannelMap[target.toLower()];
+
+		if(!handler)
+		{
+			handler = new ChannelHandler(target.startsWith('#'), this);
+			m_ChannelMap[target.toLower()] = handler;
+
+			this->addTab(handler->GetTab(), target);
+			this->setCurrentIndex(this->count() - 1);
+		}
+
+		handler->showText(txt);
+	}
+}
+
+void IrcHandler::noticeMessage(IrcPrefix origin, IrcNoticeMessage* noticeMsg)
+{
+	if(!origin.isValid())
+		return;
+
+	QString& user = origin.name();
+	QString& target = noticeMsg->target();
+	QString& message = noticeMsg->message();
+
+	if(target.startsWith("##"))
+	{
+		if(target.toLower() != ("##" + m_Username.toLower()))
+		{
+			FriendsHandler* handler = m_FriendsMap[target.toLower().mid(2)];
+			
+			if(handler)
+				handler->noticeReceived(user, message);
+		}
+	}
+	else if(target.toLower() != irc->nickName().toLower())
+	{
+		ChannelHandler* handler = m_ChannelMap[target.toLower()];
+
+		if(!handler)
+		{
+			handler = new ChannelHandler(target.startsWith('#'), this);
+			m_ChannelMap[target.toLower()] = handler;
+
+			this->addTab(handler->GetTab(), target);
+			this->setCurrentIndex(this->count() - 1);
+		}
+
+		handler->noticeReceived(user, message);
+	}
+	else
+	{
+		QString txt = QString("<span class = \"notice\">-%1- %2</span>").arg(user).arg(IrcUtil::messageToHtml(message));
+		showTextCurrentTab(txt);
+	}
+}
+
+void IrcHandler::nickMessage(IrcPrefix origin, IrcNickMessage* nickMsg)
+{
+	if(!origin.isValid())
+		return;
+	
+	QString& user = origin.name();
+
+	for(QMap<QString, ChannelHandler*>::iterator i = m_ChannelMap.constBegin(); i != m_ChannelMap.constEnd(); ++i)
+	{
+		if(!i.key().isEmpty() && (i.value() != NULL))
+			i.value()->nickChanged(user, nickMsg->nick());
 	}
 
-	QString txt = QString("<%1> %2").arg(origin).arg(message);
-	handler->showText(txt);
+	for(QMap<QString, FriendsHandler*>::iterator i = m_FriendsMap.constBegin(); i != m_FriendsMap.constEnd(); ++i)
+	{
+		if(!i.key().isEmpty() && (i.value() != NULL))
+			i.value()->nickChanged(user, nickMsg->nick());
+	}
+}
+
+void IrcHandler::numericMessage(IrcNumericMessage* numMsg)
+{	
+	int code = numMsg->code();
+	IrcMessage* msg = numMsg;
+
+	switch(code)
+	{
+	case Irc::RPL_NAMREPLY:
+		QString& channel = msg->parameters().at(2).toLower();
+		QStringList names = msg->parameters().at(3).split(' ');
+
+		if(channel.startsWith("##"))
+		{
+			if(channel.mid(2) != m_Username.toLower())
+			{
+				FriendsHandler* target = m_FriendsMap[channel.mid(2)];
+
+				if(target)
+				{
+					if(names.contains(channel.mid(2), Qt::CaseInsensitive))
+						target->SetStatus(true);
+				}
+			}
+		}
+		else
+		{
+			ChannelHandler* target = m_ChannelMap[channel];
+
+			if(target)
+				target->UpdateNames(names);
+		}
+
+		break;
+	}
+}
+
+void IrcHandler::messageReceived(IrcMessage *msg)
+{
+	switch(msg->type())
+	{
+	case IrcMessage::Join:
+		joinedChannel(msg->prefix(), dynamic_cast<IrcJoinMessage*>(msg));
+		break;
+	case IrcMessage::Part:
+		partedChannel(msg->prefix(), dynamic_cast<IrcPartMessage*>(msg));
+		break;
+	case IrcMessage::Private:
+		privateMessage(msg->prefix(), dynamic_cast<IrcPrivateMessage*>(msg));
+		break;
+	case IrcMessage::Notice:
+		noticeMessage(msg->prefix(), dynamic_cast<IrcNoticeMessage*>(msg));
+		break;
+	case IrcMessage::Nick:
+		nickMessage(msg->prefix(), dynamic_cast<IrcNickMessage*>(msg));
+		break;
+	case IrcMessage::Numeric:
+		numericMessage(dynamic_cast<IrcNumericMessage*>(msg));
+		break;
+	}
 }
 
 void IrcHandler::removeTabName(QString name)
@@ -322,49 +527,9 @@ void IrcHandler::removeTabName(QString name)
 			}
 		}
 
-		chan->GetBuffer()->deleteLater();
 		delete chan;
 
 		m_ChannelMap.remove(name.toLower());
-	}
-}
-
-void IrcHandler::numericMessageReceived(const QString& origin, uint code, const QStringList& params)
-{
-	Q_UNUSED(origin);
-
-	if(code == Irc::Rfc::ERR_NICKNAMEINUSE)
-	{
-		emit showMessage(tr("Nickname in use! Trying alternative nickname."));
-
-		irc->setNick(QString("%1_").arg(irc->nick()));
-		//irc->reconnectToServer();
-	}
-
-	else if(code == Irc::Rfc::RPL_NAMREPLY)
-	{
-		QString name = params.at(2).toLower();
-
-		if(name.startsWith("##"))
-		{
-			if(name.mid(2) != m_Username.toLower())
-			{
-				FriendsHandler* target = m_FriendsMap[name.mid(2)];
-
-				if(target)
-				{
-					if(target->GetBuffer()->names().contains(name.mid(2), Qt::CaseInsensitive))
-						target->SetStatus(true);
-				}
-			}
-		}
-		else
-		{
-			ChannelHandler* target = m_ChannelMap[name];
-
-			if(target)
-				target->UpdateNames();
-		}
 	}
 }
 
@@ -377,13 +542,19 @@ void IrcHandler::showTextCurrentTab(QString message, MessageType msgType)
 
 	switch(msgType)
 	{
-
-	case Err: spanClass = "err"; break;
-	case Friends: spanClass = "fmsg"; break;
-	case Sys: spanClass = "sysmsg"; break;
-
+	case Err:
+		spanClass = "err";
+		break;
+	case Friends:
+		spanClass = "fmsg";
+		break;
+	case Sys:
+		spanClass = "sysmsg";
+		break;
+	case Normal:
 	default:
-	case Normal: spanClass = "msg";
+		spanClass = "msg";
+		break;
 	}
 
 	if(handler)
@@ -403,10 +574,8 @@ void IrcHandler::reloadSkin()
 
 void IrcHandler::joinedGame(QString ip, QString gameName)
 {
-	if(m_Buffer)
-	{
-		m_Buffer->notice(QString("xdcc://%1;%2").arg(ip).arg(gameName));
-	}
+	irc->sendCommand(IrcCommand::createNotice(QString("##%1").arg(m_Username.toLower()),
+					 QString("xdcc://%1;%2").arg(ip).arg(gameName)));
 }
 
 void IrcHandler::handleUrl(QUrl url)
