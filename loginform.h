@@ -47,6 +47,7 @@ private:
 
 	QString Username;
 	QSettings* settings;
+	ApiFetcher* fetcher;
 
 	XDCC* m_xDCC;
 };

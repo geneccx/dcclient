@@ -149,6 +149,9 @@ CGProxy::~CGProxy()
 		delete m_PacketBuffer.front( );
 		m_PacketBuffer.pop_front( );
 	}
+
+	delete m_RemoteSocket;
+	delete m_GameProtocol;
 }
 
 void CGProxy::update()

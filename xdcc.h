@@ -19,6 +19,11 @@
 #ifndef XDCC_H
 #define XDCC_H
 
+#ifdef WIN32
+	#include <Windows.h>
+	#include <vld.h>
+#endif
+
 #include "ui_xdcc_main.h"
 
 #include <QtGui/QMainWindow>

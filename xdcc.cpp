@@ -34,7 +34,9 @@
 #include <QFile>
 #include <QEvent>
 
-#include <winsparkle.h>
+#ifdef WIN32
+	#include <winsparkle.h>
+#endif
 
 XDCC::XDCC(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 {
@@ -127,6 +129,33 @@ XDCC::XDCC(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 
 XDCC::~XDCC()
 {
+	while(!m_GameInfos.empty())
+	{
+		delete m_GameInfos.front();
+		m_GameInfos.pop_front();
+	}
+	
+	while(!m_QueueInfos.empty())
+	{
+		delete m_QueueInfos.front();
+		m_QueueInfos.pop_front();
+	}
+
+	while(!m_PlayerInfos.empty())
+	{
+		delete m_PlayerInfos.front();
+		m_PlayerInfos.pop_front();
+	}
+	
+	delete m_Settings;
+	m_Settings = NULL;
+
+	delete m_Timer;
+	delete m_CGProxy;
+	delete m_LocalServer;
+	delete m_LoginForm;
+	delete m_SettingsForm;
+
 #ifdef WIN32
 	win_sparkle_cleanup();
 #endif
@@ -134,7 +163,10 @@ XDCC::~XDCC()
 
 bool XDCC::eventFilter(QObject *obj,  QEvent *event)
 {
-	bool inactiveRefresh = m_Settings->value("InactiveRefresh", false).toBool();
+	bool inactiveRefresh = false;
+
+	if(m_Settings)
+		inactiveRefresh = m_Settings->value("InactiveRefresh", false).toBool();
 
 	static bool inActivationEvent = false;
 
@@ -449,6 +481,9 @@ void XDCC::parseQueueXml(QString& data)
 	}
 	else
 	{
+		for(int i = 0; i < ui.tblQueue->rowCount(); ++i)
+			delete ui.tblQueue->itemAt(i, 0);
+
 		ui.tblQueue->setRowCount(m_QueueInfos.size());
 
 		for(int i = 0; i < m_QueueInfos.size(); ++i)
@@ -517,6 +552,16 @@ void XDCC::parsePlayersXml(QString& data)
 	}
 	else
 	{
+		for(int i = 0; i < ui.tblPlayers->rowCount(); ++i)
+		{
+			delete ui.tblPlayers->itemAt(i, 0);
+			delete ui.tblPlayers->itemAt(i, 1);
+			delete ui.tblPlayers->itemAt(i, 2);
+			delete ui.tblPlayers->itemAt(i, 3);
+			delete ui.tblPlayers->itemAt(i, 4);
+			delete ui.tblPlayers->itemAt(i, 5);
+		}
+
 		ui.tblPlayers->setRowCount(m_PlayerInfos.size());
 
 		for(int i = 0; i < m_PlayerInfos.size(); ++i)

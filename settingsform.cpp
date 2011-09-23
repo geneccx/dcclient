@@ -52,7 +52,7 @@ SettingsForm::SettingsForm(QWidget *parent, Qt::WFlags flags)
 
 SettingsForm::~SettingsForm()
 {
-
+	delete settings;
 }
 
 void SettingsForm::saveSettings()

@@ -16,7 +16,7 @@ LoginForm::LoginForm(XDCC* nxDCC, QWidget *parent, Qt::WFlags flags)
 
 	settings = new QSettings("DotaCash", "DCClient X");
 
-	QString oldUsername = settings->value("Username").toString();
+	QString oldUsername = QSettings("DotaCash", "DCClient X").value("Username").toString();
 
 	if(!oldUsername.isEmpty())
 	{
@@ -29,7 +29,8 @@ LoginForm::LoginForm(XDCC* nxDCC, QWidget *parent, Qt::WFlags flags)
 
 LoginForm::~LoginForm()
 {
-
+	delete settings;
+	//delete fetcher;
 }
 
 void LoginForm::login()
@@ -40,15 +41,13 @@ void LoginForm::login()
 	Password = ui.txtPassword->text();
 
 	if(Username.isEmpty() || Password.isEmpty())
-	{
 		return;
-	}
 
 	ui.txtUsername->setReadOnly(true);
 	ui.txtPassword->setReadOnly(true);
 	ui.btnLogin->setDisabled(true);
 
-	ApiFetcher* fetcher = new ApiFetcher();
+	fetcher = new ApiFetcher();
 	connect(fetcher, SIGNAL(fetchComplete(QString&)), this, SLOT(parseLogin(QString&)));
 
 	QString url = "http://" + API_SERVER + QString("/api/login.php?u=%1&p=%2").arg(Username).arg(Password);

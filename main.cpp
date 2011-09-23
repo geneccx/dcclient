@@ -1,4 +1,5 @@
 #include "xdcc.h"
+
 #include "loginform.h"
 #include <QtGui/QMainWindow>
 #include <QSharedMemory>
@@ -28,8 +29,13 @@ void msgHandler(QtMsgType type, const char *msg)
 	}
 }
 
+#define _CRTDBG_MAP_ALLOC
+
 int main(int argc, char *argv[])
 {
+	//_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF  | _CRTDBG_LEAK_CHECK_DF );
+
+
 	//oldHandler = qInstallMsgHandler(msgHandler);
 
 	QApplication a(argc, argv);
@@ -70,5 +76,9 @@ int main(int argc, char *argv[])
 	_singular->create(1);
 
 	XDCC xdcc;
-	return a.exec();
+	int ret = a.exec();
+
+	delete _singular;
+
+	return ret;
 }
