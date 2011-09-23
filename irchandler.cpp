@@ -352,6 +352,26 @@ void IrcHandler::partedChannel(IrcPrefix origin, IrcPartMessage* partMsg)
 	}
 }
 
+void IrcHandler::quitMessage(IrcPrefix origin, IrcQuitMessage* quitMsg)
+{
+	if(!origin.isValid())
+		return;
+
+	QString& user = origin.name();
+
+	for(QMap<QString, ChannelHandler*>::iterator i = m_ChannelMap.constBegin(); i != m_ChannelMap.constEnd(); ++i)
+	{
+		if(!i.key().isEmpty() && (i.value() != NULL))
+			i.value()->parted(user, quitMsg->reason());
+	}
+
+	for(QMap<QString, FriendsHandler*>::iterator i = m_FriendsMap.constBegin(); i != m_FriendsMap.constEnd(); ++i)
+	{
+		if(!i.key().isEmpty() && (i.value() != NULL))
+			i.value()->parted(user, quitMsg->reason());
+	}
+}
+
 void IrcHandler::privateMessage(IrcPrefix origin, IrcPrivateMessage* privMsg)
 {
 	if(!origin.isValid())
@@ -496,6 +516,9 @@ void IrcHandler::messageReceived(IrcMessage *msg)
 		break;
 	case IrcMessage::Part:
 		partedChannel(msg->prefix(), dynamic_cast<IrcPartMessage*>(msg));
+		break;
+	case IrcMessage::Quit:
+		quitMessage(msg->prefix(), dynamic_cast<IrcQuitMessage*>(msg));
 		break;
 	case IrcMessage::Private:
 		privateMessage(msg->prefix(), dynamic_cast<IrcPrivateMessage*>(msg));

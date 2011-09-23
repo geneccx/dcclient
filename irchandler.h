@@ -81,6 +81,7 @@ private:
 	void removeTabName(QString name);
 	void joinedChannel(IrcPrefix origin, IrcJoinMessage* joinMsg);
 	void partedChannel(IrcPrefix origin, IrcPartMessage* partMsg);
+	void quitMessage(IrcPrefix origin, IrcQuitMessage* quitMsg);
 	void privateMessage(IrcPrefix origin, IrcPrivateMessage* privMsg);
 	void noticeMessage(IrcPrefix origin, IrcNoticeMessage* noticeMsg);
 	void nickMessage(IrcPrefix origin, IrcNickMessage* nickMsg);
