@@ -36,7 +36,6 @@ class FriendsHandler;
 
 enum MessageType
 {
-	Raw,
 	Normal,
 	Sys,
 	Err,
