@@ -62,8 +62,8 @@ void IrcHandler::myCloseTab(int idx)
 	{
 		if(channel.at(0) == '#')
 			irc->sendCommand(IrcCommand::createPart(channel));
-		else
-			removeTabName(channel);
+
+		removeTabName(channel);
 	}
 }
 
@@ -125,6 +125,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 					return;
 
 				irc->sendCommand(IrcCommand::createPart(origin));
+				removeTabName(origin.toLower());
 			}
 			else
 			{
@@ -328,7 +329,7 @@ void IrcHandler::partedChannel(IrcPrefix origin, IrcPartMessage* partMsg)
 	QString& user = origin.name();
 	QString& channel = partMsg->channel();
 
-	if(user.toLower() == irc->userName().toLower())
+	if(user.toLower() == irc->nickName().toLower())
 		removeTabName(channel.toLower());
 	else
 	{
@@ -457,6 +458,9 @@ void IrcHandler::nickMessage(IrcPrefix origin, IrcNickMessage* nickMsg)
 		return;
 	
 	QString& user = origin.name();
+
+	if(user == irc->nickName())
+		irc->setNickName(nickMsg->nick());
 
 	for(QMap<QString, ChannelHandler*>::iterator i = m_ChannelMap.constBegin(); i != m_ChannelMap.constEnd(); ++i)
 	{
