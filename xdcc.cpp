@@ -24,6 +24,7 @@
 #include "xmlstructs.h"
 #include "dcapifetcher.h"
 #include "qgproxy.h"
+#include "updateform.h"
 #include "loginform.h"
 #include "settingsform.h"
 
@@ -33,10 +34,7 @@
 #include <QSettings>
 #include <QFile>
 #include <QEvent>
-
-#ifdef WIN32
-	#include <winsparkle.h>
-#endif
+#include <QProcess>
 
 XDCC::XDCC(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 {
@@ -98,14 +96,11 @@ XDCC::XDCC(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 	connect(ui.action_About, SIGNAL(triggered()), this, SLOT(showAbout()));
 	connect(ui.action_Options, SIGNAL(triggered()), this, SLOT(showSettings()));
 
-#ifdef WIN32
-	win_sparkle_init();
-#endif
-
+	m_UpdateForm = new UpdateForm(this);
 	m_LoginForm = new LoginForm(this);
-	m_LoginForm->show();
-
 	m_SettingsForm = new SettingsForm(this);
+
+	connect(m_UpdateForm, SIGNAL(updateFromURL(QString&)), this, SLOT(updateFromURL(QString&)));
 
 	connect(m_CGProxy, SIGNAL(joinedGame(QString, QString)), ui.tabChannels, SLOT(joinedGame(QString, QString)));
 
@@ -125,6 +120,9 @@ XDCC::XDCC(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 
 	m_Active = true;
 	qApp->installEventFilter( this );
+
+	m_UpdateForm->checkForUpdates(APPCAST_URL, false);
+	m_LoginForm->show();
 }
 
 XDCC::~XDCC()
@@ -155,10 +153,21 @@ XDCC::~XDCC()
 	delete m_LocalServer;
 	delete m_LoginForm;
 	delete m_SettingsForm;
+}
 
-#ifdef WIN32
-	win_sparkle_cleanup();
-#endif
+void XDCC::updateFromURL(QString& url)
+{
+	m_LoginForm->hide();
+
+	QStringList params;
+	params << "--install-dir" << ".";
+	params << "--package-dir" << "updates";
+	params << "--script" << "updates/file_list.xml";
+
+	if(QProcess::startDetached("updater.exe", params))
+		QApplication::quit();
+	else
+		QMessageBox::warning(this, tr("Problem"),tr("Unable to start updater, try updating manually by downloading the file: <a href=\"%1\">%2</a>").arg(url).arg(url)); 
 }
 
 bool XDCC::eventFilter(QObject *obj,  QEvent *event)
@@ -202,11 +211,7 @@ bool XDCC::eventFilter(QObject *obj,  QEvent *event)
 
 void XDCC::checkForUpdates()
 {
-#ifdef WIN32
-	win_sparkle_check_update_with_ui();
-#else
-	QMessageBox::information(this, "DotaCash Client X", tr("This feature is currently disabled."));
-#endif
+	m_UpdateForm->checkForUpdates(APPCAST_URL, true);
 }
 
 void XDCC::showAbout()

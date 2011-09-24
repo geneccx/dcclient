@@ -10,8 +10,6 @@
 #include <qlocalserver.h>
 #include <qlocalsocket.h>
 
-#include <winsparkle.h>
-
 QSharedMemory* _singular;
 
 QtMsgHandler oldHandler = NULL;

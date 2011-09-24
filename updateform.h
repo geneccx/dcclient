@@ -16,38 +16,40 @@
 
 */
 
-#ifndef XDCC_SETTINGS_H
-#define XDCC_SETTINGS_H
+#ifndef XDCC_UPDATE_H
+#define XDCC_UPDATE_H
 
 #include <QtGui/QMainWindow>
 #include <QSettings>
 
 #include "xdcc.h"
-#include "ui_xdcc_options.h"
+#include "ui_xdcc_update.h"
 
-class SettingsForm : public QDialog
+class UpdateForm : public QDialog
 {
 	Q_OBJECT
 
 public:
-	SettingsForm(QWidget *parent = 0, Qt::WFlags flags = 0);
-	~SettingsForm();
+	UpdateForm(QWidget *parent = 0, Qt::WFlags flags = 0);
+
+	void checkForUpdates(QString appCastURL, bool alwaysShow);
 
 public slots:
-	void saveSettings();
+	void parseUpdateData(QString& data);
+	void updateNow();
 
 signals:
-	void reloadSkin();
+	void updateFromURL(QString&);
 
 private:
-	Ui_SettingsForm ui;
-	QSettings* settings;
+	Ui_UpdateDialog ui;
+	QMap<QString,QString> m_Latest;
+	ApiFetcher* m_Fetcher;
+	QString m_Version;
+	bool m_AlwaysShow;
 
-	bool m_SoundOnGameStart;
-	bool m_FriendFollow;
-	bool m_Refresh;
-
-	QString m_Skin;
+	QMap<QString, QString> UpdateForm::parseUpdateItem(QXmlStreamReader& xml);
+	void addElementDataToMap(QXmlStreamReader& xml, QMap<QString, QString>& map);
 };
 
-#endif // XDCC_SETTINGS_H
+#endif // XDCC_UPDATEFORM_H

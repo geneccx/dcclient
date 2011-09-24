@@ -16,7 +16,7 @@ LoginForm::LoginForm(XDCC* nxDCC, QWidget *parent, Qt::WFlags flags)
 
 	settings = new QSettings("DotaCash", "DCClient X");
 
-	QString oldUsername = QSettings("DotaCash", "DCClient X").value("Username").toString();
+	QString oldUsername = settings->value("Username").toString();
 
 	if(!oldUsername.isEmpty())
 	{

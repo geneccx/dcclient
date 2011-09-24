@@ -40,6 +40,7 @@
 
 class GameRequester;
 class CGProxy;
+class UpdateForm;
 class LoginForm;
 class SettingsForm;
 class ApiFetcher;
@@ -86,10 +87,13 @@ public slots:
 	void showAbout();
 	void showSettings();
 
-	void requestGame(QString IP);
+	void requestGame(QString);
+	void updateFromURL(QString&);
 
 private:
 	Ui::xDCCClass ui;
+
+	UpdateForm* m_UpdateForm;
 	LoginForm* m_LoginForm;
 	SettingsForm* m_SettingsForm;
 
