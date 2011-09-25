@@ -21,7 +21,10 @@
 
 #ifdef WIN32
 	#include <Windows.h>
-	#include <vld.h>
+
+	#ifdef _DEBUG
+		#include <vld.h>
+	#endif
 #endif
 
 #include "ui_xdcc_main.h"

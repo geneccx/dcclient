@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>UpdateDialog</class>
  <widget class="QDialog" name="UpdateDialog">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -28,6 +31,9 @@
   <property name="windowIcon">
    <iconset resource="xdcc.qrc">
     <normaloff>:/xDCC/software-update-available.ico</normaloff>:/xDCC/software-update-available.ico</iconset>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="sizeConstraint">
@@ -79,30 +85,15 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
-      <widget class="QTextBrowser" name="textBrowser">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
+      <widget class="QLabel" name="lblChangelog">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+        <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>47</height>
-        </size>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>

@@ -17,11 +17,11 @@
 */
 
 #include "updateform.h"
+#include "downloaderform.h"
 #include "dcapifetcher.h"
-#include "xmlstructs.h"
 #include "xdcc_version.h"
 
-#include <QMessageBox>
+#include <QDir>
 
 UpdateForm::UpdateForm(QWidget *parent, Qt::WFlags flags)
 	: QDialog(parent, flags)
@@ -31,9 +31,27 @@ UpdateForm::UpdateForm(QWidget *parent, Qt::WFlags flags)
 	connect(ui.okButton, SIGNAL(clicked()), this, SLOT(updateNow()));
 
 	m_Version = QSettings("DotaCash", "DCClient X").value("version", XDCC_VERSION).toString();
+
+	m_Downloader = new DownloaderForm(this);
+
+	connect(m_Downloader, SIGNAL(downloadsComplete()), this, SLOT(beginUpdate()));
 }
 
 void UpdateForm::updateNow()
+{
+	QDir updateFolder("./updates/");
+
+	QStringList list = updateFolder.entryList(QDir::Files);
+
+	for (int i = 0; i < list.size(); ++i)
+		updateFolder.remove(list.at(i));
+
+	m_Downloader->addFile("http://www.dotacash.com/xdcc/file_list.xml");
+	m_Downloader->addFile(m_Latest["url"]);
+	m_Downloader->beginDownloads();
+}
+
+void UpdateForm::beginUpdate()
 {
 	emit updateFromURL(m_Latest["url"]);
 }
@@ -52,8 +70,6 @@ void UpdateForm::parseUpdateData(QString& data)
 {
 	QXmlStreamReader xml(data);
 
-	int i = 0;
-
 	while(!xml.atEnd() && !xml.hasError())
 	{
 		xml.readNext();
@@ -68,11 +84,6 @@ void UpdateForm::parseUpdateData(QString& data)
 
 			if(xml.name() == "item")
 			{
-				if(i < 2)
-				{
-					++i;
-					continue;
-				}
 				m_Latest = parseUpdateItem(xml);
 				break;
 			}
@@ -84,64 +95,46 @@ void UpdateForm::parseUpdateData(QString& data)
 		qWarning() << "XML ERROR:" << xml.lineNumber() << ": " << xml.errorString();
 	}
 
-	QStringList splitVersion = m_Version.split('.');
-	if(!splitVersion.isEmpty())
+	bool isNewer = isUpdateRequired(m_Latest["version"]);
+	
+	if(isNewer)
 	{
-		int max = splitVersion.size();
+		ui.label->setText("<span style=\" font-size:14pt; color:#17069c;\">" + m_Latest["title"] + "</span>");
+		ui.lblChangelog->setText(m_Latest["description"].replace("</br>", "<br>"));
 
-		if(max > 3)
-			max = 3;
-
-		int ver[3] = {0};
-
-		for(int i = 0; i < max; ++i)
-			ver[i] = splitVersion[i].toInt();
-
-		QStringList splitVersion2 = m_Latest["version"].split('.');
-		
-		int max2 = splitVersion2.size();
-
-		if(max2 > 3)
-			max2 = 3;
-
-		int ver2[3] = {0};
-
-		for(int i = 0; i < max2; ++i)
-			ver2[i] = splitVersion2[i].toInt();
-
-		bool isNewer = false;
-
-		for(int i = 0; i < 3; ++i)
-		{
-			if(ver[i] > ver2[i])
-				break;
-
-			if(ver2[i] > ver[i])
-			{
-				isNewer = true;
-				break;
-			}
-		}
-
-		if(isNewer)
-		{
-			ui.label->setText("<span style=\" font-size:14pt; color:#17069c;\">" + m_Latest["title"] + "</span>");
-			ui.textBrowser->setText(m_Latest["description"].replace("</br>", "<br>"));
-			ui.textBrowser->resize(ui.textBrowser->sizeHint());
-			ui.cancelButton->setText("Later");
-			ui.okButton->show();
-		}
-		else
-		{
-			ui.label->setText("<span style=\" font-size:14pt; color:#17069c;\">" + tr("You're up to date!") + "</span>");
-			ui.textBrowser->setText(tr("DCClient v%1 is the newest version currently available.").arg(m_Version));
-			ui.cancelButton->setText("OK");
-			ui.okButton->hide();
-		}
-
-		if(isNewer || m_AlwaysShow)
-			this->show();
+		ui.cancelButton->setText("Later");
+		ui.okButton->show();
 	}
+	else
+	{
+		ui.label->setText("<span style=\" font-size:14pt; color:#17069c;\">" + tr("You're up to date!") + "</span>");
+		ui.lblChangelog->setText(tr("DCClient v%1 is the newest version currently available.").arg(m_Version));
+			
+		ui.cancelButton->setText("OK");
+		ui.okButton->hide();
+	}
+
+	if(isNewer || m_AlwaysShow)
+		this->show();
+}
+
+bool UpdateForm::isUpdateRequired(QString& latestVer)
+{
+	QStringList vals1 = m_Version.split('.');
+	QStringList vals2 = latestVer.split('.');
+
+	int i=0;
+	while(i < vals1.length() && i < vals2.length() && vals1[i] == vals2[i]) {
+		i++;
+	}
+
+	if (i < vals1.length() && i < vals2.length())
+	{
+		if(vals1[i].toInt() < vals2[i].toInt())
+			return true;
+	}
+
+	return false;
 }
 
 QMap<QString, QString> UpdateForm::parseUpdateItem(QXmlStreamReader& xml)

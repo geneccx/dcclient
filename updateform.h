@@ -25,6 +25,8 @@
 #include "xdcc.h"
 #include "ui_xdcc_update.h"
 
+class DownloaderForm;
+
 class UpdateForm : public QDialog
 {
 	Q_OBJECT
@@ -37,12 +39,15 @@ public:
 public slots:
 	void parseUpdateData(QString& data);
 	void updateNow();
+	void beginUpdate();
 
 signals:
 	void updateFromURL(QString&);
 
 private:
 	Ui_UpdateDialog ui;
+	DownloaderForm* m_Downloader;
+
 	QMap<QString,QString> m_Latest;
 	ApiFetcher* m_Fetcher;
 	QString m_Version;
@@ -50,6 +55,7 @@ private:
 
 	QMap<QString, QString> UpdateForm::parseUpdateItem(QXmlStreamReader& xml);
 	void addElementDataToMap(QXmlStreamReader& xml, QMap<QString, QString>& map);
+	bool isUpdateRequired(QString& latestVer);	
 };
 
 #endif // XDCC_UPDATEFORM_H

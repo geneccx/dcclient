@@ -157,6 +157,8 @@ XDCC::~XDCC()
 
 void XDCC::updateFromURL(QString& url)
 {
+	QMessageBox::warning(this, "DCClient X Update", tr("DCClient will now restart in order to apply updates."));
+
 	m_LoginForm->hide();
 
 	QStringList params;
