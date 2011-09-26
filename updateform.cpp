@@ -102,7 +102,7 @@ void UpdateForm::parseUpdateData(QString& data)
 		ui.label->setText("<span style=\" font-size:14pt; color:#17069c;\">" + m_Latest["title"] + "</span>");
 		ui.lblChangelog->setText(m_Latest["description"].replace("</br>", "<br>"));
 
-		ui.cancelButton->setText("Later");
+		ui.cancelButton->setText(tr("Later"));
 		ui.okButton->show();
 	}
 	else
@@ -110,7 +110,7 @@ void UpdateForm::parseUpdateData(QString& data)
 		ui.label->setText("<span style=\" font-size:14pt; color:#17069c;\">" + tr("You're up to date!") + "</span>");
 		ui.lblChangelog->setText(tr("DCClient v%1 is the newest version currently available.").arg(m_Version));
 			
-		ui.cancelButton->setText("OK");
+		ui.cancelButton->setText(tr("OK"));
 		ui.okButton->hide();
 	}
 
