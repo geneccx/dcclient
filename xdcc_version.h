@@ -17,7 +17,7 @@
 */
 
 #ifndef XDCC_VERSION
-#define XDCC_VERSION "1.8.0\0"
+#define XDCC_VERSION "1.8.1\0"
 
 const QString API_SERVER = "emma.dotacash.com";
 const QString APPCAST_URL = "http://www.dotacash.com/xdcc/appcast.xml";

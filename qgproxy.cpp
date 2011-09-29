@@ -75,11 +75,9 @@ CGProxy::CGProxy(QWidget* parent) : QObject(parent), m_LocalSocket(0)
 	m_LocalServer = new QTcpServer(this);
 
 	m_ListenPort = 6125;
+
 	while(!m_LocalServer->listen(QHostAddress::LocalHost, m_ListenPort))
-	{
-		qDebug() << tr("failed to listen on %1").arg(m_ListenPort);
 		m_ListenPort++;
-	}
 
 	connect(m_LocalServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 

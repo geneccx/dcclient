@@ -39,7 +39,7 @@
    </property>
    <property name="url">
     <url>
-     <string>file:///X:/dotacash/xdcc</string>
+     <string>about:blank</string>
     </url>
    </property>
   </widget>

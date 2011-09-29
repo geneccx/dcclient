@@ -250,7 +250,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 	else
 	{
 		irc->sendCommand(IrcCommand::createMessage(origin.toLower(), Message));
-		showTextCurrentTab(QString("<%1> %2").arg(irc->nickName()).arg(Message));
+		showTextCurrentTab(QString("&lt;%1&gt; %2").arg(irc->nickName()).arg(Message));
 	}
 }
 
