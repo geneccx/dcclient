@@ -147,7 +147,21 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 			QString to = Payload.at(0);
 			Payload.pop_front();
 
-			irc->sendCommand(IrcCommand::createMessage(to, Payload.join(" ")));
+			QString& txt = Payload.join(" ");
+
+			ChannelHandler* handler = m_ChannelMap[to.toLower()];
+
+			if(!handler)
+			{
+				handler = new ChannelHandler(false, this);
+				m_ChannelMap[to.toLower()] = handler;
+
+				this->addTab(handler->GetTab(), to);
+				this->setCurrentIndex(this->count() - 1);
+			}
+
+			handler->showText(QString("&lt;%1&gt; %2").arg(irc->nickName()).arg(txt));
+			irc->sendCommand(IrcCommand::createMessage(to, txt));
 		}
 
 		else if((Command == "/f" || Command == "/friends") && !Payload.isEmpty())
@@ -394,20 +408,39 @@ void IrcHandler::privateMessage(IrcPrefix origin, IrcPrivateMessage* privMsg)
 				handler->messageReceived(user, message);
 		}
 	}
-	else if(target.toLower() != irc->nickName().toLower())
+	else
 	{
-		ChannelHandler* handler = m_ChannelMap[target.toLower()];
-
-		if(!handler)
+		if(target.toLower() != irc->nickName().toLower())
 		{
-			handler = new ChannelHandler(target.startsWith('#'), this);
-			m_ChannelMap[target.toLower()] = handler;
+			ChannelHandler* handler = m_ChannelMap[target.toLower()];
 
-			this->addTab(handler->GetTab(), target);
-			this->setCurrentIndex(this->count() - 1);
+			if(!handler)
+			{
+				handler = new ChannelHandler(true, this);
+				m_ChannelMap[target.toLower()] = handler;
+
+				this->addTab(handler->GetTab(), target);
+				this->setCurrentIndex(this->count() - 1);
+			}
+
+			handler->showText(txt);
+		}
+		else
+		{
+			ChannelHandler* handler = m_ChannelMap[user.toLower()];
+
+			if(!handler)
+			{
+				handler = new ChannelHandler(false, this);
+				m_ChannelMap[user.toLower()] = handler;
+
+				this->addTab(handler->GetTab(), user);
+				this->setCurrentIndex(this->count() - 1);
+			}
+
+			handler->showText(txt);
 		}
 
-		handler->showText(txt);
 	}
 }
 

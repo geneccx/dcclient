@@ -279,7 +279,7 @@
              <number>4</number>
             </property>
             <attribute name="horizontalHeaderVisible">
-             <bool>true</bool>
+             <bool>false</bool>
             </attribute>
             <attribute name="horizontalHeaderDefaultSectionSize">
              <number>210</number>
@@ -386,7 +386,7 @@
              <number>4</number>
             </property>
             <attribute name="horizontalHeaderVisible">
-             <bool>true</bool>
+             <bool>false</bool>
             </attribute>
             <attribute name="horizontalHeaderDefaultSectionSize">
              <number>210</number>
@@ -493,7 +493,7 @@
              <number>4</number>
             </property>
             <attribute name="horizontalHeaderVisible">
-             <bool>true</bool>
+             <bool>false</bool>
             </attribute>
             <attribute name="horizontalHeaderDefaultSectionSize">
              <number>210</number>
@@ -1116,7 +1116,7 @@
  <connections>
   <connection>
    <sender>actionE_xit</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>xDCCClass</receiver>
    <slot>close()</slot>
    <hints>

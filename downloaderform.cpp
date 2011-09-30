@@ -28,9 +28,6 @@ DownloaderForm::DownloaderForm(QWidget *parent, Qt::WFlags flags)
 
 	ui.progressBar->setValue(0);
 
-	connect(&manager, SIGNAL(finished(QNetworkReply*)),
-		SLOT(downloadFinished(QNetworkReply*)));
-
 	downloadedCount = 1;
 	totalCount = 0;
 }
