@@ -4,7 +4,6 @@
 Debug/*
 Release/*
 GeneratedFiles/*
-*.vcxproj.*
 Makefile*
 .DS_Store
 ipch/*
