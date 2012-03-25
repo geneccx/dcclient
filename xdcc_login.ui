@@ -118,7 +118,7 @@
       <item>
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Don't have an account?</string>
+         <string>Don't have an account yet?</string>
         </property>
        </widget>
       </item>

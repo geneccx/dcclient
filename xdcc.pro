@@ -5,6 +5,8 @@ QT += core gui network webkit
 
 CONFIG += release
 
+CONFIG += communi
+
 DEFINES += QT_LARGEFILE_SUPPORT QT_NETWORK_LIB QT_WEBKIT_LIB
 
 INCLUDEPATH += ./GeneratedFiles \

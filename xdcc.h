@@ -29,7 +29,7 @@
 
 #include "ui_xdcc_main.h"
 
-#include <QtGui/QMainWindow>
+#include <QtGui>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QXmlStreamReader>
@@ -40,6 +40,7 @@
 #include <qlocalsocket.h>
 #include <QSettings>
 #include <QStringList>
+#include <QSystemTrayIcon>
 
 class GameRequester;
 class CGProxy;
@@ -57,8 +58,10 @@ class XDCC : public QMainWindow
 	Q_OBJECT
 
 public:
-	XDCC(QWidget *parent = 0, Qt::WFlags flags = 0);
+	explicit XDCC(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~XDCC();
+
+	bool createConnection();
 
 	void SetUsername(QString nUsername)		{ m_Username = nUsername; ui.lbl_Account->setText(m_Username); }
 	void SetScore(quint32 nScore)		{ m_Score = nScore; ui.lbl_Rating->setText(QString::number(m_Score)); }
@@ -71,6 +74,8 @@ public:
 	QString GetSessionID()	{ return m_SessionID; }
 
 	void activate();
+
+	QSystemTrayIcon *trayIcon;
 
 public slots:
 	void tick();
@@ -86,6 +91,7 @@ public slots:
 	void parsePlayersXml(QString&);
 
 	void showMessage(QString, int);
+	void notifyMessage(QString title, QString message, int);
 	void checkForUpdates();
 	void showAbout();
 	void showSettings();
@@ -93,8 +99,21 @@ public slots:
 	void requestGame(QString);
 	void updateFromURL(QString&);
 
+private slots:
+	void messageClicked();
+	void trayIconClicked(QSystemTrayIcon::ActivationReason);
+    void showHideWindow();
+
 private:
 	Ui::xDCCClass ui;
+
+	// Tray Icon Functions
+    void createTrayActions();
+    void createTrayIcon();
+    void setTrayIcon();
+
+	void closeEvent(QCloseEvent *);
+    void changeEvent(QEvent *);
 
 	UpdateForm* m_UpdateForm;
 	LoginForm* m_LoginForm;
@@ -128,6 +147,15 @@ private:
 	ApiFetcher* m_PlayersFetcher;
 	ApiFetcher* m_GamesFetcher;
 	ApiFetcher* m_QueueFetcher;
+
+	QAction *minimizeAction;
+    QAction *maximizeAction;
+    QAction *restoreAction;
+    QAction *quitAction;
+
+    QMenu *trayIconMenu;
+    QAction *showHideTray;
+    QAction *closeTray;
 };
 
 #endif // XDCC_H

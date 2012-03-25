@@ -53,8 +53,9 @@ void FriendsHandler::joined(const QString user)
 	if(user.toLower() == m_FriendName.toLower())
 	{
 		m_Status = true;
+		QString timestamp = QDateTime::currentDateTime().toString("hh:mm");
 
-		emit showMessage(tr("Your friend %1 is now online.").arg(user), Friends);
+		emit showMessage(tr("[%2] Your friend %1 is now online.").arg(user).arg(timestamp), Friends);
 	}
 }
 
@@ -63,8 +64,9 @@ void FriendsHandler::parted(const QString user, const QString reason)
 	if(user.toLower() == m_FriendName.toLower())
 	{
 		m_Status = false;
+		QString timestamp = QDateTime::currentDateTime().toString("hh:mm");
 
-		emit showMessage(tr("Your friend %1 is now offline.").arg(user), Friends);
+		emit showMessage(tr("[%2] Your friend %1 is now offline.").arg(user).arg(timestamp), Friends);
 	}
 }
 
@@ -72,7 +74,8 @@ void FriendsHandler::messageReceived(const QString &origin, const QString &messa
 {
 	if(origin.toLower() == m_FriendName.toLower())
 	{
-		emit showMessage(QString("&lt;%1&gt; %2").arg(origin).arg(message), Friends);
+		QString timestamp = QDateTime::currentDateTime().toString("hh:mm");
+		emit showMessage(QString("[%3]&lt;%1&gt; %2").arg(origin).arg(message).arg(timestamp), Friends);
 	}
 }
 
@@ -87,7 +90,9 @@ void FriendsHandler::noticeReceived(const QString &origin, const QString &messag
 			QString IP = message.mid(7).left(idx-7);
 			QString gameName = message.mid(idx+1);
 
-			emit showMessage(tr("Your friend %1 has joined the game <a href=xdcc://%2>%3</a>").arg(origin).arg(IP).arg(gameName), Friends);
+			QString timestamp = QDateTime::currentDateTime().toString("hh:mm");
+
+			emit showMessage(tr("[%4] Your friend %1 has joined the game <a href=xdcc://%2>%3</a>").arg(origin).arg(IP).arg(gameName).arg(timestamp), Friends);
 
 			QSettings settings("DotaCash", "DCClient X");
 			if(settings.value("FriendFollow", true).toBool())

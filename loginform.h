@@ -19,7 +19,7 @@
 #ifndef XDCC_LOGIN_H
 #define XDCC_LOGIN_H
 
-#include <QtGui/QMainWindow>
+#include <QtGui>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QXmlStreamReader>
@@ -50,6 +50,8 @@ private:
 	ApiFetcher* fetcher;
 
 	XDCC* m_xDCC;
+
+	void closeEvent(QCloseEvent *);
 };
 
 #endif // XDCC_H

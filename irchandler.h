@@ -23,13 +23,14 @@
 #include <QMap>
 #include <QStringList>
 #include <QUrl>
+#include <QDateTime>
 
 #define COMMUNI_STATIC
 #include <Irc>
 #include <IrcMessage>
 #include <IrcSession>
 #include <IrcCommand>
-#include <ircprefix.h>
+#include <IrcSender>
 
 class ChannelHandler;
 class FriendsHandler;
@@ -67,6 +68,7 @@ public slots:
 
 signals:
 	void showMessage(QString, int timeout=3000);
+	void notifyMessage(QString, QString, int timeout=3000);
 	void requestGame(QString);
 
 private:
@@ -79,12 +81,12 @@ private:
 	QStringList m_Friends;
 
 	void removeTabName(QString name);
-	void joinedChannel(IrcPrefix origin, IrcJoinMessage* joinMsg);
-	void partedChannel(IrcPrefix origin, IrcPartMessage* partMsg);
-	void quitMessage(IrcPrefix origin, IrcQuitMessage* quitMsg);
-	void privateMessage(IrcPrefix origin, IrcPrivateMessage* privMsg);
-	void noticeMessage(IrcPrefix origin, IrcNoticeMessage* noticeMsg);
-	void nickMessage(IrcPrefix origin, IrcNickMessage* nickMsg);
+	void joinedChannel(IrcSender origin, IrcJoinMessage* joinMsg);
+	void partedChannel(IrcSender origin, IrcPartMessage* partMsg);
+	void quitMessage(IrcSender origin, IrcQuitMessage* quitMsg);
+	void privateMessage(IrcSender origin, IrcPrivateMessage* privMsg);
+	void noticeMessage(IrcSender origin, IrcNoticeMessage* noticeMsg);
+	void nickMessage(IrcSender origin, IrcNickMessage* nickMsg);
 	void numericMessage(IrcNumericMessage* numMsg);
 };
 

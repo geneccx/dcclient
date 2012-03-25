@@ -131,3 +131,8 @@ void LoginForm::parseLogin(QString& data)
 		QMessageBox::information(this, "", QString("%1").arg(resultMap["reason"]));
 	}
 }
+ 
+void LoginForm::closeEvent(QCloseEvent *event)
+{
+	QApplication::exit(0);
+}

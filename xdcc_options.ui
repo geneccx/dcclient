@@ -51,20 +51,9 @@
        <string>Main</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout">
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="optionSoundGameStart">
-         <property name="text">
-          <string>Play a sound when the game starts</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="optionFriendFollow">
-         <property name="text">
-          <string>Automatically add games friends join to the list</string>
-         </property>
-        </widget>
-       </item>
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
        <item row="0" column="0" colspan="2">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
@@ -88,6 +77,20 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="optionSoundGameStart">
+         <property name="text">
+          <string>Play a sound when the game starts</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="optionFriendFollow">
+         <property name="text">
+          <string>Automatically add games friends join to the list</string>
+         </property>
+        </widget>
        </item>
        <item row="4" column="0">
         <widget class="QCheckBox" name="optionRefresh">

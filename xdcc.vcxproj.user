@@ -7,12 +7,12 @@
     <LocalDebuggerEnvironment>PATH=$(QTDIR)\bin%3b"$(QTDIR)\bin%3b$(PATH)</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup>
-    <QTDIR>D:\Qt\4.7.4</QTDIR>
-    <LocalDebuggerCommand Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)..\Build\xdcc.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)..\Build\</LocalDebuggerWorkingDirectory>
+    <QTDIR>D:\Qt\4.8.0</QTDIR>
+    <LocalDebuggerCommand Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\build\xdcc.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommand Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetPath)</LocalDebuggerCommand>
+    <LocalDebuggerCommand Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetPath)\build\xdcc.exe</LocalDebuggerCommand>
     <DebuggerFlavor Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerWorkingDirectory Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)../</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
 </Project>

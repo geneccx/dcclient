@@ -40,6 +40,11 @@ XDCC::XDCC(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 {
 	ui.setupUi(this);
 
+	createTrayActions();
+    createTrayIcon();
+    setTrayIcon();
+	trayIcon->show();
+
 	m_Settings = new QSettings("DotaCash", "DCClient X", this);
 
 	m_Timer = new QTimer(this);
@@ -153,6 +158,10 @@ XDCC::~XDCC()
 	delete m_LocalServer;
 	delete m_LoginForm;
 	delete m_SettingsForm;
+	delete trayIcon;
+    delete trayIconMenu;
+    delete showHideTray;
+    delete closeTray;
 }
 
 void XDCC::updateFromURL(QString& url)
@@ -333,6 +342,8 @@ void XDCC::activate()
 {
 	ui.tabChannels->connectToIrc(this->GetUsername());
 	connect(ui.tabChannels, SIGNAL(showMessage(QString, int)), this, SLOT(showMessage(QString, int)));
+	connect(ui.tabChannels, SIGNAL(notifyMessage(QString, QString, int)), this, SLOT(notifyMessage(QString, QString, int)));
+	connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
 	connect(m_SettingsForm, SIGNAL(reloadSkin()), ui.tabChannels, SLOT(reloadSkin()));
 	connect(ui.tabChannels, SIGNAL(requestGame(QString)), this , SLOT(requestGame(QString)));
 
@@ -640,4 +651,100 @@ void XDCC::requestGame(QString IP)
 	safelistFetcher->fetch(safelistUrl);
 
 	m_CGProxy->requestGame(IP);
+}
+
+void XDCC::messageClicked()
+{
+    showHideWindow();
+}
+
+void XDCC::notifyMessage(QString title, QString message, int timeout=3000)
+{
+	if(this->isHidden())
+	{
+		QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon(1);
+		trayIcon->showMessage(title, message, icon, timeout);
+	}
+}
+
+void XDCC::changeEvent(QEvent *event)
+{
+	QWidget::changeEvent(event);
+	if (event->type() == QEvent::WindowStateChange)
+	{
+		QWindowStateChangeEvent *e = (QWindowStateChangeEvent*)event;
+		// make sure we only do this for minimize events
+		if ((e->oldState() != Qt::WindowMinimized) && isMinimized())
+		{
+			QTimer::singleShot(0, this, SLOT(showHideWindow()));
+			event->ignore();
+		}
+	}
+}
+ 
+void XDCC::closeEvent(QCloseEvent *event)
+{
+	QMessageBox messageBox;
+    messageBox.setWindowTitle(tr("Dotacash Client"));
+    messageBox.setText(tr("Do you really want to quit?"));
+    messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    messageBox.setDefaultButton(QMessageBox::No);
+    if (messageBox.exec() == QMessageBox::Yes)
+		QApplication::exit(0);
+	else
+		event->ignore();
+}
+ 
+void XDCC::showHideWindow()
+{
+    if(this->isVisible())
+    {
+        this->hide();
+        showHideTray->setIcon(QIcon(":/xDCC/xdcc.ico"));
+        showHideTray->setText("Show Main Window");
+    }
+    else
+    {
+        this->showNormal();
+		QWidget::activateWindow();
+        showHideTray->setIcon(QIcon(":/xDCC/xdcc.ico"));
+        showHideTray->setText("Hide Main Window");
+    }
+}
+ 
+void XDCC::trayIconClicked(QSystemTrayIcon::ActivationReason reason)
+{
+    if(reason == QSystemTrayIcon::DoubleClick)
+        showHideWindow();
+}
+ 
+void XDCC::setTrayIcon()
+{
+    trayIcon->setIcon(QIcon(":/xDCC/xdcc.ico"));
+}
+void XDCC::createTrayIcon()
+{
+    trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(showHideTray);
+    trayIconMenu->addSeparator();
+    trayIconMenu->addAction(closeTray);
+ 
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu(trayIconMenu);
+ 
+    connect(
+            trayIcon,
+          SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+            this,
+            SLOT(trayIconClicked(QSystemTrayIcon::ActivationReason))
+           );
+}
+void XDCC::createTrayActions()
+{
+    showHideTray = new QAction(tr("&Hide Main Window"), this);
+    connect(showHideTray, SIGNAL(triggered()), this, SLOT(showHideWindow()));
+    showHideTray->setIcon(QIcon(":/xDCC/xdcc.ico"));
+    closeTray = new QAction(tr("&Exit"), this);
+    connect(closeTray, SIGNAL(triggered()), qApp, SLOT(quit()));
+    closeTray->setIcon(QIcon(":/xDCC/xdcc.ico"));
 }

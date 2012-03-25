@@ -91,6 +91,8 @@ int main(int argc, char *argv[])
 
 	_singular->create(1);
 
+	QApplication::setQuitOnLastWindowClosed(false);
+
 	XDCC xdcc;
 	int ret = a.exec();
 

@@ -1060,7 +1060,7 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="actionE_xit"/>
+    <addaction name="quitAction"/>
    </widget>
    <widget class="QMenu" name="menu_Tools">
     <property name="title">
@@ -1080,7 +1080,7 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionE_xit">
+  <action name="quitAction">
    <property name="text">
     <string>E&amp;xit</string>
    </property>
@@ -1115,7 +1115,7 @@
  </resources>
  <connections>
   <connection>
-   <sender>actionE_xit</sender>
+   <sender>quitAction</sender>
    <signal>triggered()</signal>
    <receiver>xDCCClass</receiver>
    <slot>close()</slot>

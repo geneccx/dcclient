@@ -122,12 +122,14 @@ void ChannelHandler::parted(const QString user, const QString reason)
 
 void ChannelHandler::messageReceived(const QString &origin, const QString &message)
 {
-	QString txt = QString("<span class = \"msg\">&lt;%1&gt; %2</span>").arg(origin).arg(IrcUtil::messageToHtml(message));
+	QString timestamp = QDateTime::currentDateTime().toString("hh:mm");
+	QString txt = QString("<span class = \"msg\">[%3]&lt;%1&gt; %2</span>").arg(origin).arg(IrcUtil::messageToHtml(message)).arg(timestamp);
 	txtChat->append(txt);
 }
 
 void ChannelHandler::noticeReceived(const QString &origin, const QString &message)
 {
-	QString txt = QString("<span class = \"notice\">-%1- %2</span>").arg(origin).arg(IrcUtil::messageToHtml(message));
+	QString timestamp = QDateTime::currentDateTime().toString("hh:mm");
+	QString txt = QString("<span class = \"notice\">[%3] -%1- %2</span>").arg(origin).arg(IrcUtil::messageToHtml(message)).arg(timestamp);
 	txtChat->append(txt);
 }

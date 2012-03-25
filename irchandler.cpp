@@ -70,6 +70,7 @@ void IrcHandler::myCloseTab(int idx)
 void IrcHandler::connected()
 {
 	emit showMessage(tr("Connected to %1").arg("irc.dotacash.com"), 3000);
+	emit notifyMessage(tr("Dotacash Client"), tr("Connected to %1").arg("irc.dotacash.com"), 3000);
 
 	irc->sendCommand(IrcCommand::createJoin("#dcchat"));
 	irc->sendCommand(IrcCommand::createJoin("#dotacash"));
@@ -87,6 +88,7 @@ void IrcHandler::disconnected()
 	m_ChannelMap.clear();
 
 	emit showMessage(tr("Disconnected from %1, reconnecting...").arg("irc.dotacash.com"), 3000);
+	emit notifyMessage(tr("Dotacash Client"), tr("Disconnected from %1, reconnecting...").arg("irc.dotacash.com"), 3000);
 }
 
 void IrcHandler::handleChat(QString& origin, QString& Message)
@@ -159,8 +161,8 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 				this->addTab(handler->GetTab(), to);
 				this->setCurrentIndex(this->count() - 1);
 			}
-
-			handler->showText(QString("&lt;%1&gt; %2").arg(irc->nickName()).arg(txt));
+			QString timestamp = QDateTime::currentDateTime().toString("hh:mm");
+			handler->showText(QString("[%3]&lt;%1&gt; %2").arg(irc->nickName()).arg(txt).arg(timestamp));
 			irc->sendCommand(IrcCommand::createMessage(to, txt));
 		}
 
@@ -263,12 +265,13 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 	}
 	else
 	{
+		QString timestamp = QDateTime::currentDateTime().toString("hh:mm");
 		irc->sendCommand(IrcCommand::createMessage(origin.toLower(), Message));
-		showTextCurrentTab(QString("&lt;%1&gt; %2").arg(irc->nickName()).arg(Message));
+		showTextCurrentTab(QString("[%3]&lt;%1&gt; %2").arg(irc->nickName()).arg(Message).arg(timestamp));
 	}
 }
 
-void IrcHandler::joinedChannel(IrcPrefix origin, IrcJoinMessage* joinMsg)
+void IrcHandler::joinedChannel(IrcSender origin, IrcJoinMessage* joinMsg)
 {
 	if(!origin.isValid())
 		return;
@@ -335,7 +338,7 @@ void IrcHandler::joinedChannel(IrcPrefix origin, IrcJoinMessage* joinMsg)
 	}
 }
 
-void IrcHandler::partedChannel(IrcPrefix origin, IrcPartMessage* partMsg)
+void IrcHandler::partedChannel(IrcSender origin, IrcPartMessage* partMsg)
 {
 	if(!origin.isValid())
 		return;
@@ -367,7 +370,7 @@ void IrcHandler::partedChannel(IrcPrefix origin, IrcPartMessage* partMsg)
 	}
 }
 
-void IrcHandler::quitMessage(IrcPrefix origin, IrcQuitMessage* quitMsg)
+void IrcHandler::quitMessage(IrcSender origin, IrcQuitMessage* quitMsg)
 {
 	if(!origin.isValid())
 		return;
@@ -387,7 +390,7 @@ void IrcHandler::quitMessage(IrcPrefix origin, IrcQuitMessage* quitMsg)
 	}
 }
 
-void IrcHandler::privateMessage(IrcPrefix origin, IrcPrivateMessage* privMsg)
+void IrcHandler::privateMessage(IrcSender origin, IrcPrivateMessage* privMsg)
 {
 	if(!origin.isValid())
 		return;
@@ -395,8 +398,9 @@ void IrcHandler::privateMessage(IrcPrefix origin, IrcPrivateMessage* privMsg)
 	QString& user = origin.name();
 	QString& target = privMsg->target();
 	QString& message = privMsg->message();
+	QString timestamp = QDateTime::currentDateTime().toString("hh:mm");
 
-	QString txt = QString("<%1> %2").arg(user).arg(message);
+	QString txt = QString("[%3] <%1> %2").arg(user).arg(message).arg(timestamp);
 
 	if(target.startsWith("##"))
 	{
@@ -404,8 +408,10 @@ void IrcHandler::privateMessage(IrcPrefix origin, IrcPrivateMessage* privMsg)
 		{
 			FriendsHandler* handler = m_FriendsMap[target.toLower().mid(2)];
 			
-			if(handler)
+			if(handler) {
+				emit notifyMessage(QString("Incoming whisper from %1").arg(user), message, 3000);
 				handler->messageReceived(user, message);
+			}
 		}
 	}
 	else
@@ -422,7 +428,6 @@ void IrcHandler::privateMessage(IrcPrefix origin, IrcPrivateMessage* privMsg)
 				this->addTab(handler->GetTab(), target);
 				this->setCurrentIndex(this->count() - 1);
 			}
-
 			handler->showText(txt);
 		}
 		else
@@ -444,7 +449,7 @@ void IrcHandler::privateMessage(IrcPrefix origin, IrcPrivateMessage* privMsg)
 	}
 }
 
-void IrcHandler::noticeMessage(IrcPrefix origin, IrcNoticeMessage* noticeMsg)
+void IrcHandler::noticeMessage(IrcSender origin, IrcNoticeMessage* noticeMsg)
 {
 	if(!origin.isValid())
 		return;
@@ -485,7 +490,7 @@ void IrcHandler::noticeMessage(IrcPrefix origin, IrcNoticeMessage* noticeMsg)
 	}
 }
 
-void IrcHandler::nickMessage(IrcPrefix origin, IrcNickMessage* nickMsg)
+void IrcHandler::nickMessage(IrcSender origin, IrcNickMessage* nickMsg)
 {
 	if(!origin.isValid())
 		return;
@@ -549,22 +554,22 @@ void IrcHandler::messageReceived(IrcMessage *msg)
 	switch(msg->type())
 	{
 	case IrcMessage::Join:
-		joinedChannel(msg->prefix(), dynamic_cast<IrcJoinMessage*>(msg));
+		joinedChannel(msg->sender(), dynamic_cast<IrcJoinMessage*>(msg));
 		break;
 	case IrcMessage::Part:
-		partedChannel(msg->prefix(), dynamic_cast<IrcPartMessage*>(msg));
+		partedChannel(msg->sender(), dynamic_cast<IrcPartMessage*>(msg));
 		break;
 	case IrcMessage::Quit:
-		quitMessage(msg->prefix(), dynamic_cast<IrcQuitMessage*>(msg));
+		quitMessage(msg->sender(), dynamic_cast<IrcQuitMessage*>(msg));
 		break;
 	case IrcMessage::Private:
-		privateMessage(msg->prefix(), dynamic_cast<IrcPrivateMessage*>(msg));
+		privateMessage(msg->sender(), dynamic_cast<IrcPrivateMessage*>(msg));
 		break;
 	case IrcMessage::Notice:
-		noticeMessage(msg->prefix(), dynamic_cast<IrcNoticeMessage*>(msg));
+		noticeMessage(msg->sender(), dynamic_cast<IrcNoticeMessage*>(msg));
 		break;
 	case IrcMessage::Nick:
-		nickMessage(msg->prefix(), dynamic_cast<IrcNickMessage*>(msg));
+		nickMessage(msg->sender(), dynamic_cast<IrcNickMessage*>(msg));
 		break;
 	case IrcMessage::Numeric:
 		numericMessage(dynamic_cast<IrcNumericMessage*>(msg));
