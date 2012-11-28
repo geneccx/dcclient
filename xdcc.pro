@@ -7,14 +7,12 @@ CONFIG += release
 
 CONFIG += communi
 
-DEFINES += QT_LARGEFILE_SUPPORT QT_NETWORK_LIB QT_WEBKIT_LIB
+DEFINES += QT_LARGEFILE_SUPPORT QT_NETWORK_LIB QT_WEBKIT_LIB COMMUNI_STATIC
 
 INCLUDEPATH += ./GeneratedFiles \
     ./GeneratedFiles/Release \
     ./include \
     .
-
-LIBS += -Llib -lircclient-qt
 
 DEPENDPATH += .
 
@@ -30,4 +28,4 @@ win32: {
     LIBS += -lwinmm -lWinSparkle
 }
 
-QMAKE_CXXFLAGS += /J
+#QMAKE_CXXFLAGS += /J

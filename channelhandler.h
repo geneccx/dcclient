@@ -24,7 +24,6 @@
 #include <QTextBrowser>
 #include <QListWidget>
 
-#define COMMUNI_STATIC
 #include <Irc>
 #include <IrcMessage>
 #include <ircutil.h>

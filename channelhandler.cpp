@@ -19,7 +19,6 @@
 #include <QObject>
 #include <QFile>
 
-#define COMMUNI_STATIC
 #include <ircutil.h>
 
 #include "channelhandler.h"

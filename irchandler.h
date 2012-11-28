@@ -25,7 +25,6 @@
 #include <QUrl>
 #include <QDateTime>
 
-#define COMMUNI_STATIC
 #include <Irc>
 #include <IrcMessage>
 #include <IrcSession>
