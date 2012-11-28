@@ -99,7 +99,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 	if(Message.isEmpty())
 		return;
 
-	ChannelHandler* channel = m_ChannelMap[origin.toLower()];
+//	ChannelHandler* channel = m_ChannelMap[origin.toLower()];
 
 	if(Message.startsWith('/'))
 	{
@@ -149,7 +149,7 @@ void IrcHandler::handleChat(QString& origin, QString& Message)
 			QString to = Payload.at(0);
 			Payload.pop_front();
 
-			QString& txt = Payload.join(" ");
+            const QString& txt = Payload.join(" ");
 
 			ChannelHandler* handler = m_ChannelMap[to.toLower()];
 
@@ -276,9 +276,9 @@ void IrcHandler::joinedChannel(IrcSender origin, IrcJoinMessage* joinMsg)
 	if(!origin.isValid())
 		return;
 
-	QString& user = origin.name();
-	QString& channel = joinMsg->channel();
-	QString nameLower = channel.toLower();
+    const QString& user = origin.name();
+    const QString& channel = joinMsg->channel();
+    const QString nameLower = channel.toLower();
 
 	if(user.toLower() == irc->nickName().toLower())
 	{
@@ -343,8 +343,8 @@ void IrcHandler::partedChannel(IrcSender origin, IrcPartMessage* partMsg)
 	if(!origin.isValid())
 		return;
 
-	QString& user = origin.name();
-	QString& channel = partMsg->channel();
+    const QString& user = origin.name();
+    const QString& channel = partMsg->channel();
 
 	if(user.toLower() == irc->nickName().toLower())
 		removeTabName(channel.toLower());
@@ -375,15 +375,15 @@ void IrcHandler::quitMessage(IrcSender origin, IrcQuitMessage* quitMsg)
 	if(!origin.isValid())
 		return;
 
-	QString& user = origin.name();
+    const QString& user = origin.name();
 
-	for(QMap<QString, ChannelHandler*>::iterator i = m_ChannelMap.constBegin(); i != m_ChannelMap.constEnd(); ++i)
+    for(QMap<QString, ChannelHandler*>::const_iterator i = m_ChannelMap.constBegin(); i != m_ChannelMap.constEnd(); ++i)
 	{
 		if(!i.key().isEmpty() && (i.value() != NULL))
 			i.value()->parted(user, quitMsg->reason());
 	}
 
-	for(QMap<QString, FriendsHandler*>::iterator i = m_FriendsMap.constBegin(); i != m_FriendsMap.constEnd(); ++i)
+    for(QMap<QString, FriendsHandler*>::const_iterator i = m_FriendsMap.constBegin(); i != m_FriendsMap.constEnd(); ++i)
 	{
 		if(!i.key().isEmpty() && (i.value() != NULL))
 			i.value()->parted(user, quitMsg->reason());
@@ -395,10 +395,10 @@ void IrcHandler::privateMessage(IrcSender origin, IrcPrivateMessage* privMsg)
 	if(!origin.isValid())
 		return;
 
-	QString& user = origin.name();
-	QString& target = privMsg->target();
-	QString& message = privMsg->message();
-	QString timestamp = QDateTime::currentDateTime().toString("hh:mm");
+    const QString& user = origin.name();
+    const QString& target = privMsg->target();
+    const QString& message = privMsg->message();
+    const QString timestamp = QDateTime::currentDateTime().toString("hh:mm");
 
 	QString txt = QString("[%3] <%1> %2").arg(user).arg(message).arg(timestamp);
 
@@ -454,9 +454,9 @@ void IrcHandler::noticeMessage(IrcSender origin, IrcNoticeMessage* noticeMsg)
 	if(!origin.isValid())
 		return;
 
-	QString& user = origin.name();
-	QString& target = noticeMsg->target();
-	QString& message = noticeMsg->message();
+    const QString& user = origin.name();
+    const QString& target = noticeMsg->target();
+    const QString& message = noticeMsg->message();
 
 	if(target.startsWith("##"))
 	{
@@ -495,18 +495,18 @@ void IrcHandler::nickMessage(IrcSender origin, IrcNickMessage* nickMsg)
 	if(!origin.isValid())
 		return;
 	
-	QString& user = origin.name();
+    const QString& user = origin.name();
 
 	if(user == irc->nickName())
 		irc->setNickName(nickMsg->nick());
 
-	for(QMap<QString, ChannelHandler*>::iterator i = m_ChannelMap.constBegin(); i != m_ChannelMap.constEnd(); ++i)
+    for(QMap<QString, ChannelHandler*>::const_iterator i = m_ChannelMap.constBegin(); i != m_ChannelMap.constEnd(); ++i)
 	{
 		if(!i.key().isEmpty() && (i.value() != NULL))
 			i.value()->nickChanged(user, nickMsg->nick());
 	}
 
-	for(QMap<QString, FriendsHandler*>::iterator i = m_FriendsMap.constBegin(); i != m_FriendsMap.constEnd(); ++i)
+    for(QMap<QString, FriendsHandler*>::const_iterator i = m_FriendsMap.constBegin(); i != m_FriendsMap.constEnd(); ++i)
 	{
 		if(!i.key().isEmpty() && (i.value() != NULL))
 			i.value()->nickChanged(user, nickMsg->nick());
@@ -521,8 +521,8 @@ void IrcHandler::numericMessage(IrcNumericMessage* numMsg)
 	switch(code)
 	{
 	case Irc::RPL_NAMREPLY:
-		QString& channel = msg->parameters().at(2).toLower();
-		QStringList names = msg->parameters().at(3).split(' ');
+        const QString& channel = msg->parameters().at(2).toLower();
+        const QStringList names = msg->parameters().at(3).split(' ');
 
 		if(channel.startsWith("##"))
 		{
@@ -574,6 +574,8 @@ void IrcHandler::messageReceived(IrcMessage *msg)
 	case IrcMessage::Numeric:
 		numericMessage(dynamic_cast<IrcNumericMessage*>(msg));
 		break;
+    default:
+        break;
 	}
 }
 

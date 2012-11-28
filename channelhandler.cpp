@@ -70,7 +70,7 @@ void ChannelHandler::reloadSkin()
 	}
 }
 
-void ChannelHandler::UpdateNames(QStringList& names)
+void ChannelHandler::UpdateNames(const QStringList& names)
 {
 	if(!lstUsers)
 		return;
@@ -105,7 +105,7 @@ void ChannelHandler::joined(const QString user)
 	}
 }
 
-void ChannelHandler::parted(const QString user, const QString reason)
+void ChannelHandler::parted(const QString user, const QString)
 {
 	if(!lstUsers)
 		return;

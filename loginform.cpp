@@ -132,7 +132,7 @@ void LoginForm::parseLogin(QString& data)
 	}
 }
  
-void LoginForm::closeEvent(QCloseEvent *event)
+void LoginForm::closeEvent(QCloseEvent *)
 {
 	QApplication::exit(0);
 }

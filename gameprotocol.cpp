@@ -149,7 +149,7 @@ CGameInfo* CGameProtocol :: RECEIVE_W3GS_GAMEINFO ( QByteArray data )
 		return new CGameInfo(ProductID, Version, HostCounter, EntryKey, GameName, GamePassword, StatString, SlotsTotal, MapGameType, Unknown2, SlotsOpen, UpTime, Port, Reliable);
 	}
 
-	return false;
+    return NULL;
 
 }
 
@@ -184,7 +184,7 @@ QByteArray CGameProtocol :: SEND_W3GS_CHAT_FROM_HOST( quint8 fromPID, QByteArray
 		ds << fromPID;
 		ds << flag;
 
-		if(flagExtra != -1)
+        if(flagExtra != (quint32)-1)
 			ds << flagExtra;
 
 		ds.writeRawData(message.toAscii(), message.length());

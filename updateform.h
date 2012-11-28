@@ -53,7 +53,7 @@ private:
 	QString m_Version;
 	bool m_AlwaysShow;
 
-	QMap<QString, QString> UpdateForm::parseUpdateItem(QXmlStreamReader& xml);
+    QMap<QString, QString> parseUpdateItem(QXmlStreamReader& xml);
 	void addElementDataToMap(QXmlStreamReader& xml, QMap<QString, QString>& map);
 	bool isUpdateRequired(QString& latestVer);	
 };

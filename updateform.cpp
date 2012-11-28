@@ -17,13 +17,12 @@
 */
 
 #include "updateform.h"
-#include "downloaderform.h"
 #include "dcapifetcher.h"
 #include "xdcc_version.h"
 
 #include <QDir>
 
-UpdateForm::UpdateForm(QWidget *parent, Qt::WFlags flags)
+UpdateForm::UpdateForm(QWidget *parent, QFlags<Qt::WindowType> flags)
 	: QDialog(parent, flags)
 {
 	ui.setupUi(this);
@@ -32,28 +31,28 @@ UpdateForm::UpdateForm(QWidget *parent, Qt::WFlags flags)
 
 	m_Version = QSettings("DotaCash", "DCClient X").value("version", XDCC_VERSION).toString();
 
-	m_Downloader = new DownloaderForm(this);
+//	m_Downloader = new DownloaderForm(this);
 
-	connect(m_Downloader, SIGNAL(downloadsComplete()), this, SLOT(beginUpdate()));
+//	connect(m_Downloader, SIGNAL(downloadsComplete()), this, SLOT(beginUpdate()));
 }
 
 void UpdateForm::updateNow()
 {
-	QDir updateFolder("./updates/");
+//	QDir updateFolder("./updates/");
 
-	QStringList list = updateFolder.entryList(QDir::Files);
+//	QStringList list = updateFolder.entryList(QDir::Files);
 
-	for (int i = 0; i < list.size(); ++i)
-		updateFolder.remove(list.at(i));
+//	for (int i = 0; i < list.size(); ++i)
+//		updateFolder.remove(list.at(i));
 
-	m_Downloader->addFile("http://www.dotacash.com/xdcc/file_list.xml");
-	m_Downloader->addFile(m_Latest["url"]);
-	m_Downloader->beginDownloads();
+//	m_Downloader->addFile("http://www.dotacash.com/xdcc/file_list.xml");
+//	m_Downloader->addFile(m_Latest["url"]);
+//	m_Downloader->beginDownloads();
 }
 
 void UpdateForm::beginUpdate()
 {
-	emit updateFromURL(m_Latest["url"]);
+    emit updateFromURL(m_Latest["url"]);
 }
 
 void UpdateForm::checkForUpdates(QString appCastURL, bool alwaysShow)

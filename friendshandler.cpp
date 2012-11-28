@@ -19,7 +19,7 @@
 #include "friendshandler.h"
 
 FriendsHandler::FriendsHandler(QString nFriendName, QWidget *parent) :
-	m_FriendName(nFriendName), QObject(parent)
+    QObject(parent), m_FriendName(nFriendName)
 {
 	m_Status = false;
 
@@ -59,7 +59,7 @@ void FriendsHandler::joined(const QString user)
 	}
 }
 
-void FriendsHandler::parted(const QString user, const QString reason)
+void FriendsHandler::parted(const QString user, const QString)
 {
 	if(user.toLower() == m_FriendName.toLower())
 	{

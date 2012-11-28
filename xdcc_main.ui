@@ -61,12 +61,6 @@
           <height>16777215</height>
          </size>
         </property>
-        <property name="font">
-         <font>
-          <family>MS Shell Dlg 2</family>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
         <property name="text">
          <string>Current Games</string>
         </property>
@@ -91,12 +85,6 @@
           <width>260</width>
           <height>16777215</height>
          </size>
-        </property>
-        <property name="font">
-         <font>
-          <family>MS Shell Dlg 2</family>
-          <pointsize>8</pointsize>
-         </font>
         </property>
         <property name="tabShape">
          <enum>QTabWidget::Rounded</enum>
@@ -137,12 +125,6 @@
               <width>0</width>
               <height>0</height>
              </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>MS Shell Dlg 2</family>
-              <pointsize>8</pointsize>
-             </font>
             </property>
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
@@ -245,12 +227,6 @@
               <height>0</height>
              </size>
             </property>
-            <property name="font">
-             <font>
-              <family>MS Shell Dlg 2</family>
-              <pointsize>8</pointsize>
-             </font>
-            </property>
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
             </property>
@@ -352,12 +328,6 @@
               <height>0</height>
              </size>
             </property>
-            <property name="font">
-             <font>
-              <family>MS Shell Dlg 2</family>
-              <pointsize>8</pointsize>
-             </font>
-            </property>
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
             </property>
@@ -458,12 +428,6 @@
               <width>0</width>
               <height>0</height>
              </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>MS Shell Dlg 2</family>
-              <pointsize>8</pointsize>
-             </font>
             </property>
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
@@ -567,12 +531,6 @@
           <height>16777215</height>
          </size>
         </property>
-        <property name="font">
-         <font>
-          <family>MS Shell Dlg 2</family>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -658,16 +616,6 @@
           <height>0</height>
          </size>
         </property>
-        <property name="font">
-         <font>
-          <family>MS Shell Dlg 2</family>
-          <pointsize>12</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-          <stylestrategy>PreferDefault</stylestrategy>
-          <kerning>true</kerning>
-         </font>
-        </property>
         <property name="text">
          <string>Players in Game</string>
         </property>
@@ -720,12 +668,6 @@
             <height>16777215</height>
            </size>
           </property>
-          <property name="font">
-           <font>
-            <family>MS Shell Dlg 2</family>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
           <property name="text">
            <string>Gaming Profile</string>
           </property>
@@ -741,12 +683,6 @@
             <width>16777215</width>
             <height>16777215</height>
            </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>MS Shell Dlg 2</family>
-            <pointsize>10</pointsize>
-           </font>
           </property>
           <property name="text">
            <string>Account:</string>
@@ -767,14 +703,6 @@
             <height>16777215</height>
            </size>
           </property>
-          <property name="font">
-           <font>
-            <family>MS Shell Dlg 2</family>
-            <pointsize>8</pointsize>
-            <weight>50</weight>
-            <bold>false</bold>
-           </font>
-          </property>
           <property name="text">
            <string>@@@@@@@@@@@@@@@</string>
           </property>
@@ -790,12 +718,6 @@
             <width>16777215</width>
             <height>16777215</height>
            </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>MS Shell Dlg 2</family>
-            <pointsize>10</pointsize>
-           </font>
           </property>
           <property name="text">
            <string>Rating:</string>
@@ -816,12 +738,6 @@
             <height>16777215</height>
            </size>
           </property>
-          <property name="font">
-           <font>
-            <family>MS Shell Dlg 2</family>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
           <property name="text">
            <string>1000</string>
           </property>
@@ -834,12 +750,6 @@
             <width>16777215</width>
             <height>16777215</height>
            </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>MS Shell Dlg 2</family>
-            <pointsize>10</pointsize>
-           </font>
           </property>
           <property name="text">
            <string>Rank:</string>
@@ -859,12 +769,6 @@
             <width>16777215</width>
             <height>16777215</height>
            </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>MS Shell Dlg 2</family>
-            <pointsize>8</pointsize>
-           </font>
           </property>
           <property name="text">
            <string>1</string>
@@ -895,12 +799,6 @@
             <height>16777215</height>
            </size>
           </property>
-          <property name="font">
-           <font>
-            <family>MS Shell Dlg 2</family>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
           <property name="text">
            <string>Games in Queue</string>
           </property>
@@ -922,12 +820,6 @@
             <width>178</width>
             <height>16777215</height>
            </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>MS Shell Dlg 2</family>
-            <pointsize>8</pointsize>
-           </font>
           </property>
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -1012,11 +904,6 @@
           <height>0</height>
          </size>
         </property>
-        <property name="font">
-         <font>
-          <family>MS Shell Dlg 2</family>
-         </font>
-        </property>
         <property name="currentIndex">
          <number>-1</number>
         </property>
@@ -1036,11 +923,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="font">
-         <font>
-          <family>MS Shell Dlg 2</family>
-         </font>
-        </property>
        </widget>
       </item>
      </layout>
@@ -1053,7 +935,7 @@
      <x>0</x>
      <y>0</y>
      <width>921</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1110,9 +992,7 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="xdcc.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>quitAction</sender>

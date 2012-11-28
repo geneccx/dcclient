@@ -38,7 +38,7 @@ public:
 	QWidget* GetTab() { return m_Tab; }
 
 	void showText(QString msg) { txtChat->append(msg); }
-	void UpdateNames(QStringList& names);
+    void UpdateNames(const QStringList &names);
 	void reloadSkin();
 
 	void joined(const QString);

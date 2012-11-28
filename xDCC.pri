@@ -11,7 +11,8 @@ HEADERS += ./xmlstructs.h \
     ./qgproxy.h \
     ./xdcc_version.h \
     ./settingsform.h \
-    ./friendshandler.h
+    ./friendshandler.h \
+    ./updateform.h
 
 SOURCES += ./dcapifetcher.cpp \
     ./main.cpp \
@@ -24,7 +25,8 @@ SOURCES += ./dcapifetcher.cpp \
     ./gpsprotocol.cpp \
     ./qgproxy.cpp \
     ./settingsform.cpp \
-    ./friendshandler.cpp
+    ./friendshandler.cpp \
+    ./updateform.cpp
 
 FORMS += ./xdcc_main.ui \
     ./xdcc_login.ui \
